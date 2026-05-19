@@ -52,6 +52,31 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
+// Update a stream
+router.put("/:id", auth, async (req, res) => {
+  try {
+    const stream = await Stream.findOne({ _id: req.params.id, user: req.user._id });
+    if (!stream) {
+      return res.status(404).json({ error: "Stream not found." });
+    }
+    if (stream.status === "live") {
+      return res.status(400).json({ error: "Stop the stream before editing." });
+    }
+    const { title, platform, streamKey, rtmpUrl, quality, mode, videos } = req.body;
+    if (title) stream.title = title;
+    if (platform) stream.platform = platform;
+    if (streamKey) stream.streamKey = streamKey;
+    if (rtmpUrl !== undefined) stream.rtmpUrl = rtmpUrl || getDefaultRtmpUrl(platform || stream.platform);
+    if (quality) stream.quality = quality;
+    if (mode) stream.mode = mode;
+    if (videos !== undefined) stream.videos = videos;
+    await stream.save();
+    res.json({ stream });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update stream." });
+  }
+});
+
 // Start a stream
 router.post("/:id/start", auth, async (req, res) => {
   try {
