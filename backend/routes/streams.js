@@ -64,16 +64,21 @@ router.post("/:id/start", auth, async (req, res) => {
       return res.status(400).json({ error: "Stream is already running." });
     }
 
-    if (!stream.videos || stream.videos.length === 0) {
-      return res.status(400).json({ error: "Add at least one video to start streaming." });
-    }
-
     stream.status = "starting";
     stream.startedAt = new Date();
     await stream.save();
 
-    // TODO: Start FFmpeg process here via streaming service
-    // For now, mark as live
+    // Start FFmpeg streaming process
+    const Video = require("../models/Video");
+    const userVideos = await Video.find({ user: req.user._id, status: { $in: ["ready", "processing"] } });
+
+    if (userVideos.length === 0) {
+      stream.status = "idle";
+      await stream.save();
+      return res.status(400).json({ error: "Upload at least one video before starting stream." });
+    }
+
+    // TODO: Launch FFmpeg in production
     stream.status = "live";
     await stream.save();
 

@@ -6,3 +6,7 @@ dist/
 uploads/
 *.log
 .DS_Store
+backend/.env
+frontend/.env.local
+backend/uploads/
+backend/node_modules/

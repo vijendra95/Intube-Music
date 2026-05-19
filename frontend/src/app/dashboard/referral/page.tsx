@@ -1,106 +1,110 @@
 "use client";
 
-import { Gift, Copy, Users, IndianRupee, CheckCircle, Share2 } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Gift, Users, CreditCard, Copy, Check } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { api } from "@/lib/api";
 
 export default function ReferralPage() {
-  const referralCode = "INTUBE-USER123";
-  const referralLink = `https://intubemedia.live/register?ref=${referralCode}`;
+  const { user } = useAuth();
+  const [stats, setStats] = useState({ totalReferrals: 0, activeSubscriptions: 0, totalEarnings: 0 });
+  const [copied, setCopied] = useState("");
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const data = await api("/referrals/stats");
+      setStats(data);
+    } catch {
+      // silent
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  const copyText = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(field);
+    setTimeout(() => setCopied(""), 2000);
+  };
+
+  const referralLink = `https://intubemedia.live/register?ref=${user?.referralCode || ""}`;
 
   return (
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Referral & Earn</h1>
-        <p className="text-gray-400">Earn 10% commission on every payment made by your referrals</p>
+        <p className="text-gray-500">Earn 10% commission on every referral payment</p>
       </div>
 
-      {/* Referral Info */}
-      <div className="glass rounded-xl p-6 mb-6">
-        <div className="flex items-center gap-3 mb-4">
-          <Gift className="w-6 h-6 text-cyan-400" />
-          <h2 className="text-lg font-bold">How it works</h2>
-        </div>
-        <div className="grid md:grid-cols-3 gap-4">
-          <div className="bg-gray-800/50 rounded-lg p-4 text-center">
-            <Share2 className="w-8 h-8 text-cyan-400 mx-auto mb-2" />
-            <h3 className="font-medium mb-1">1. Share Your Link</h3>
-            <p className="text-sm text-gray-400">Share your referral code or link with friends</p>
+      {/* How it works */}
+      <div className="card p-6 mb-6">
+        <h3 className="font-semibold mb-4">How it works</h3>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="text-center">
+            <div className="w-10 h-10 gradient-bg rounded-full flex items-center justify-center mx-auto mb-2 text-white font-bold text-sm">1</div>
+            <p className="text-sm text-gray-300">Share your link</p>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-4 text-center">
-            <Users className="w-8 h-8 text-green-400 mx-auto mb-2" />
-            <h3 className="font-medium mb-1">2. Friend Signs Up</h3>
-            <p className="text-sm text-gray-400">They register using your referral code</p>
+          <div className="text-center">
+            <div className="w-10 h-10 gradient-bg rounded-full flex items-center justify-center mx-auto mb-2 text-white font-bold text-sm">2</div>
+            <p className="text-sm text-gray-300">Friend signs up</p>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-4 text-center">
-            <IndianRupee className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
-            <h3 className="font-medium mb-1">3. You Earn 10%</h3>
-            <p className="text-sm text-gray-400">Get 10% of every payment they make</p>
+          <div className="text-center">
+            <div className="w-10 h-10 gradient-bg rounded-full flex items-center justify-center mx-auto mb-2 text-white font-bold text-sm">3</div>
+            <p className="text-sm text-gray-300">Earn 10% forever</p>
           </div>
         </div>
       </div>
 
       {/* Referral Code & Link */}
-      <div className="glass rounded-xl p-6 mb-6">
-        <h2 className="text-lg font-bold mb-4">Your Referral Details</h2>
-
-        <div className="space-y-4">
-          <div>
-            <label className="text-sm text-gray-400 mb-1 block">Referral Code</label>
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={referralCode}
-                readOnly
-                className="flex-1 bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 text-white font-mono"
-              />
-              <button className="bg-gray-800 hover:bg-gray-700 border border-gray-700 p-3 rounded-lg transition">
-                <Copy className="w-5 h-5" />
-              </button>
-            </div>
+      <div className="grid md:grid-cols-2 gap-4 mb-6">
+        <div className="card p-5">
+          <label className="text-xs text-gray-500 uppercase mb-2 block">Your Referral Code</label>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 bg-[#0f0a1e] border border-purple-900/30 rounded-xl py-2.5 px-4 text-purple-300 font-mono text-sm">
+              {user?.referralCode || "—"}
+            </code>
+            <button
+              onClick={() => copyText(user?.referralCode || "", "code")}
+              className="p-2.5 bg-purple-500/10 rounded-xl text-purple-400 hover:bg-purple-500/20 transition"
+            >
+              {copied === "code" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+            </button>
           </div>
-
-          <div>
-            <label className="text-sm text-gray-400 mb-1 block">Referral Link</label>
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={referralLink}
-                readOnly
-                className="flex-1 bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 text-white font-mono text-sm"
-              />
-              <button className="bg-gray-800 hover:bg-gray-700 border border-gray-700 p-3 rounded-lg transition">
-                <Copy className="w-5 h-5" />
-              </button>
-            </div>
+        </div>
+        <div className="card p-5">
+          <label className="text-xs text-gray-500 uppercase mb-2 block">Your Referral Link</label>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 bg-[#0f0a1e] border border-purple-900/30 rounded-xl py-2.5 px-4 text-purple-300 font-mono text-xs truncate">
+              {referralLink}
+            </code>
+            <button
+              onClick={() => copyText(referralLink, "link")}
+              className="p-2.5 bg-purple-500/10 rounded-xl text-purple-400 hover:bg-purple-500/20 transition"
+            >
+              {copied === "link" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+            </button>
           </div>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
-        <div className="glass rounded-xl p-4 text-center">
-          <Users className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-          <p className="text-2xl font-bold">0</p>
-          <p className="text-sm text-gray-400">Total Referrals</p>
+      <div className="grid grid-cols-3 gap-4">
+        <div className="card p-5 text-center">
+          <Users className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+          <p className="text-2xl font-bold">{stats.totalReferrals}</p>
+          <p className="text-xs text-gray-500">Total Referrals</p>
         </div>
-        <div className="glass rounded-xl p-4 text-center">
-          <CheckCircle className="w-8 h-8 text-green-400 mx-auto mb-2" />
-          <p className="text-2xl font-bold">0</p>
-          <p className="text-sm text-gray-400">Active Subscriptions</p>
+        <div className="card p-5 text-center">
+          <CreditCard className="w-6 h-6 text-green-400 mx-auto mb-2" />
+          <p className="text-2xl font-bold">{stats.activeSubscriptions}</p>
+          <p className="text-xs text-gray-500">Active Subs</p>
         </div>
-        <div className="glass rounded-xl p-4 text-center">
-          <IndianRupee className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
-          <p className="text-2xl font-bold">₹0</p>
-          <p className="text-sm text-gray-400">Total Earnings</p>
-        </div>
-      </div>
-
-      {/* Referral History */}
-      <div className="glass rounded-xl p-6">
-        <h2 className="text-lg font-bold mb-4">Referral History</h2>
-        <div className="text-center py-8">
-          <Users className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-          <p className="text-gray-400">No referrals yet</p>
-          <p className="text-gray-500 text-sm mt-1">Share your link to start earning</p>
+        <div className="card p-5 text-center">
+          <Gift className="w-6 h-6 text-amber-400 mx-auto mb-2" />
+          <p className="text-2xl font-bold">₹{stats.totalEarnings}</p>
+          <p className="text-xs text-gray-500">Earned</p>
         </div>
       </div>
     </div>

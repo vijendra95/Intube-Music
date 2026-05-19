@@ -52,6 +52,24 @@ router.put("/password", auth, async (req, res) => {
   }
 });
 
+// Dashboard stats
+router.get("/dashboard", auth, async (req, res) => {
+  try {
+    const Video = require("../models/Video");
+    const Stream = require("../models/Stream");
+
+    const videos = await Video.countDocuments({ user: req.user._id });
+    const activeStreams = await Stream.countDocuments({ user: req.user._id, status: "live" });
+    const videosDocs = await Video.find({ user: req.user._id }).select("size");
+    const storageUsed = videosDocs.reduce((sum, v) => sum + (v.size || 0), 0);
+    const streamSlots = req.user.streamSlots || 1;
+
+    res.json({ videos, activeStreams, storageUsed, streamSlots });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch dashboard stats." });
+  }
+});
+
 // Admin: Get all users
 router.get("/", adminAuth, async (req, res) => {
   try {

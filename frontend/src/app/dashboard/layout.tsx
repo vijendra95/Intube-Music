@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
 import {
   Tv,
   LayoutDashboard,
@@ -32,6 +34,34 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, loading, logout } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0f0a1e] flex items-center justify-center">
+        <div className="text-purple-400 animate-pulse text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) return null;
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
+
+  const storageUsed = user.storage?.used || 0;
+  const storageLimit = user.storage?.limit || 1073741824;
+  const storageMB = (storageUsed / (1024 * 1024)).toFixed(0);
+  const storageLimitGB = (storageLimit / (1024 * 1024 * 1024)).toFixed(0);
 
   return (
     <div className="min-h-screen bg-[#0f0a1e] flex">
@@ -52,16 +82,19 @@ export default function DashboardLayout({
         <div className="p-4 border-b border-purple-900/30">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-sm">
-              U
+              {user.name?.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">User Name</p>
-              <p className="text-xs text-gray-500 truncate">user@email.com</p>
+              <p className="text-sm font-medium truncate">{user.name}</p>
+              <p className="text-xs text-gray-500 truncate">{user.email}</p>
             </div>
           </div>
-          <span className="inline-block mt-2.5 text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full px-2.5 py-0.5 font-medium">
-            Free Plan
-          </span>
+          <div className="flex items-center gap-2 mt-2.5">
+            <span className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full px-2.5 py-0.5 font-medium capitalize">
+              {user.plan} Plan
+            </span>
+            <span className="text-xs text-gray-600">{storageMB}MB / {storageLimitGB}GB</span>
+          </div>
         </div>
 
         {/* Nav */}
@@ -86,7 +119,10 @@ export default function DashboardLayout({
         </nav>
 
         <div className="p-3 border-t border-purple-900/30">
-          <button className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-gray-500 hover:text-red-400 hover:bg-red-500/10 w-full transition">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-gray-500 hover:text-red-400 hover:bg-red-500/10 w-full transition"
+          >
             <LogOut className="w-[18px] h-[18px]" />
             Sign Out
           </button>
