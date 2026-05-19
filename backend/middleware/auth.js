@@ -5,7 +5,9 @@ const JWT_SECRET = process.env.JWT_SECRET || "intubemedia-secret-key-change-in-p
 
 const auth = async (req, res, next) => {
   try {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
+    const authHeader = req.header("Authorization") || "";
+    const xAuthToken = req.header("X-Auth-Token") || "";
+    const token = xAuthToken || (authHeader.startsWith("Bearer ") ? authHeader.replace("Bearer ", "") : "");
     if (!token) {
       return res.status(401).json({ error: "Access denied. No token provided." });
     }
