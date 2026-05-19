@@ -1,1 +1,1 @@
-# Intube Music\n\nA Spotify/Apple Music-like audio streaming platform.
+# IntubeMedia.live - 24/7 YouTube Live Streaming Platform
