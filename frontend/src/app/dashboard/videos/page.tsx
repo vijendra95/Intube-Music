@@ -16,7 +16,8 @@ interface VideoItem {
 export default function VideosPage() {
   const [videos, setVideos] = useState<VideoItem[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState("");
+  const [uploadPercent, setUploadPercent] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState("");
   const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
 
@@ -43,20 +44,25 @@ export default function VideosPage() {
 
     setError("");
     setUploading(true);
-    setUploadProgress(`Uploading ${file.name}...`);
+    setUploadPercent(0);
+    setUploadStatus(`Uploading ${file.name}...`);
 
     try {
       const formData = new FormData();
       formData.append("video", file);
       formData.append("title", file.name.replace(/\.[^/.]+$/, ""));
-      await uploadFile("/videos/upload", formData);
-      setUploadProgress("Upload complete!");
+      await uploadFile("/videos/upload", formData, (percent) => {
+        setUploadPercent(percent);
+        setUploadStatus(`Uploading ${file.name}... ${percent}%`);
+      });
+      setUploadPercent(100);
+      setUploadStatus("Upload complete!");
       fetchVideos();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploading(false);
-      setTimeout(() => setUploadProgress(""), 3000);
+      setTimeout(() => { setUploadStatus(""); setUploadPercent(0); }, 3000);
     }
   };
 
@@ -102,8 +108,19 @@ export default function VideosPage() {
       >
         <Upload className="w-12 h-12 text-purple-500/50 mx-auto mb-3" />
         <p className="text-gray-300 mb-2 font-medium">
-          {uploading ? uploadProgress : "Drag & drop video or click to upload"}
+          {uploading ? uploadStatus : "Drag & drop video or click to upload"}
         </p>
+        {uploading && (
+          <div className="w-full max-w-xs mx-auto mb-3">
+            <div className="w-full bg-purple-900/30 rounded-full h-3 overflow-hidden">
+              <div
+                className="h-full rounded-full gradient-bg transition-all duration-300"
+                style={{ width: `${uploadPercent}%` }}
+              />
+            </div>
+            <p className="text-purple-400 text-sm font-bold mt-1">{uploadPercent}%</p>
+          </div>
+        )}
         <p className="text-gray-600 text-xs mb-4">MP4, MOV, AVI, WebM — Max 2GB per file</p>
         <label className="inline-flex items-center gap-2 gradient-bg hover:opacity-90 text-white px-6 py-2.5 rounded-full font-medium cursor-pointer transition shadow-lg shadow-purple-500/20">
           <Upload className="w-4 h-4" /> Choose File

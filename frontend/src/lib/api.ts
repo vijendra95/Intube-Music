@@ -33,25 +33,41 @@ export async function api(endpoint: string, options: ApiOptions = {}) {
   return data;
 }
 
-export async function uploadFile(endpoint: string, formData: FormData) {
+export async function uploadFile(
+  endpoint: string,
+  formData: FormData,
+  onProgress?: (percent: number) => void
+) {
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-  const headers: Record<string, string> = {};
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `${API_URL}${endpoint}`);
 
-  const res = await fetch(`${API_URL}${endpoint}`, {
-    method: "POST",
-    headers,
-    body: formData,
+    if (token) {
+      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    }
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      try {
+        const data = JSON.parse(xhr.responseText);
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(data);
+        } else {
+          reject(new Error(data.error || "Upload failed"));
+        }
+      } catch {
+        reject(new Error("Upload failed"));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error("Upload failed — network error"));
+    xhr.send(formData);
   });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data.error || "Upload failed");
-  }
-
-  return data;
 }
