@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Radio,
+  Tv,
   LayoutDashboard,
   Video,
   Wifi,
@@ -22,7 +22,7 @@ const navItems = [
   { href: "/dashboard/streams", icon: Wifi, label: "Live Streams" },
   { href: "/dashboard/subscription", icon: CreditCard, label: "Subscription" },
   { href: "/dashboard/referral", icon: Gift, label: "Referral & Earn" },
-  { href: "/dashboard/payments", icon: Receipt, label: "Payment History" },
+  { href: "/dashboard/payments", icon: Receipt, label: "Payments" },
   { href: "/dashboard/settings", icon: Settings, label: "Settings" },
 ];
 
@@ -34,35 +34,37 @@ export default function DashboardLayout({
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-gray-950 flex">
+    <div className="min-h-screen bg-[#0f0a1e] flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col fixed h-full">
-        <div className="p-4 border-b border-gray-800">
+      <aside className="w-64 bg-[#130e24] border-r border-purple-900/30 flex flex-col fixed h-full">
+        <div className="p-5 border-b border-purple-900/30">
           <Link href="/" className="flex items-center gap-2">
-            <Radio className="w-7 h-7 text-cyan-400" />
-            <span className="text-lg font-bold">
-              Intube<span className="text-cyan-400">Media</span>.live
+            <div className="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
+              <Tv className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-lg font-bold tracking-tight">
+              intube<span className="text-purple-400">media</span>
             </span>
           </Link>
         </div>
 
-        {/* User Info */}
-        <div className="p-4 border-b border-gray-800">
+        {/* User */}
+        <div className="p-4 border-b border-purple-900/30">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-cyan-500/20 border border-cyan-500/30 rounded-full flex items-center justify-center text-cyan-400 font-bold">
+            <div className="w-10 h-10 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-sm">
               U
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">User Name</p>
-              <p className="text-xs text-gray-400 truncate">user@email.com</p>
+              <p className="text-xs text-gray-500 truncate">user@email.com</p>
             </div>
           </div>
-          <span className="inline-block mt-2 text-xs bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded px-2 py-0.5">
+          <span className="inline-block mt-2.5 text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full px-2.5 py-0.5 font-medium">
             Free Plan
           </span>
         </div>
 
-        {/* Navigation */}
+        {/* Nav */}
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
@@ -70,50 +72,47 @@ export default function DashboardLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition ${
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition ${
                   isActive
-                    ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
-                    : "text-gray-400 hover:text-white hover:bg-gray-800"
+                    ? "bg-purple-500/15 text-purple-300 border border-purple-500/30"
+                    : "text-gray-400 hover:text-white hover:bg-[#1a1333]"
                 }`}
               >
-                <item.icon className="w-5 h-5" />
+                <item.icon className="w-[18px] h-[18px]" />
                 {item.label}
               </Link>
             );
           })}
         </nav>
 
-        {/* Sign Out */}
-        <div className="p-3 border-t border-gray-800">
-          <button className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 w-full transition">
-            <LogOut className="w-5 h-5" />
+        <div className="p-3 border-t border-purple-900/30">
+          <button className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-gray-500 hover:text-red-400 hover:bg-red-500/10 w-full transition">
+            <LogOut className="w-[18px] h-[18px]" />
             Sign Out
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main */}
       <div className="flex-1 ml-64">
-        {/* Top Header */}
-        <header className="sticky top-0 z-40 bg-gray-950/80 backdrop-blur-sm border-b border-gray-800 px-6 py-3 flex items-center justify-between">
+        <header className="sticky top-0 z-40 bg-[#0f0a1e]/80 backdrop-blur-xl border-b border-purple-900/30 px-6 py-3 flex items-center justify-between">
           <div></div>
           <div className="flex items-center gap-3">
             <Link
               href="/dashboard/videos"
-              className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white px-4 py-2 rounded-lg text-sm transition"
+              className="flex items-center gap-2 bg-[#1a1333] hover:bg-[#251d40] border border-purple-900/50 text-white px-4 py-2 rounded-full text-sm transition"
             >
-              <Upload className="w-4 h-4" /> Upload Video
+              <Upload className="w-4 h-4" /> Upload
             </Link>
             <Link
               href="/dashboard/streams"
-              className="flex items-center gap-2 bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+              className="flex items-center gap-2 gradient-bg hover:opacity-90 text-white px-4 py-2 rounded-full text-sm font-medium transition shadow-lg shadow-purple-500/20"
             >
               <Plus className="w-4 h-4" /> New Stream
             </Link>
           </div>
         </header>
 
-        {/* Page Content */}
         <main className="p-6">{children}</main>
       </div>
     </div>

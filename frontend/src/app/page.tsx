@@ -1,112 +1,122 @@
 import Link from "next/link";
 import {
-  Wifi,
+  Zap,
   Upload,
   Key,
   Play,
-  Radio,
+  Tv,
   Monitor,
   Globe,
   RefreshCw,
-  Palette,
+  Layers,
   BarChart3,
   ListMusic,
   Shield,
   Smartphone,
   Check,
-  X,
   ChevronDown,
+  Star,
+  Sparkles,
+  ArrowRight,
 } from "lucide-react";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gray-950">
+    <div className="min-h-screen bg-[#0f0a1e] overflow-hidden">
       {/* Navbar */}
-      <nav className="fixed top-0 w-full z-50 glass">
+      <nav className="fixed top-0 w-full z-50 bg-[#0f0a1e]/80 backdrop-blur-xl border-b border-purple-900/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
-            <Radio className="w-8 h-8 text-cyan-400" />
-            <span className="text-xl font-bold">
-              Intube<span className="text-cyan-400">Media</span>.live
+            <div className="w-9 h-9 rounded-lg gradient-bg flex items-center justify-center">
+              <Tv className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold tracking-tight">
+              intube<span className="text-purple-400">media</span>
             </span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-gray-300 hover:text-white transition">Features</a>
-            <a href="#pricing" className="text-gray-300 hover:text-white transition">Pricing</a>
-            <a href="#faq" className="text-gray-300 hover:text-white transition">FAQ</a>
-            <a href="#contact" className="text-gray-300 hover:text-white transition">Contact</a>
+            <a href="#how-it-works" className="text-gray-400 hover:text-white text-sm transition">How it Works</a>
+            <a href="#features" className="text-gray-400 hover:text-white text-sm transition">Features</a>
+            <a href="#pricing" className="text-gray-400 hover:text-white text-sm transition">Pricing</a>
+            <a href="#faq" className="text-gray-400 hover:text-white text-sm transition">FAQ</a>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="text-gray-300 hover:text-white transition px-4 py-2">
-              Login
+            <Link href="/login" className="text-gray-300 hover:text-white text-sm transition px-4 py-2">
+              Sign In
             </Link>
             <Link
               href="/register"
-              className="bg-cyan-500 hover:bg-cyan-600 text-white px-5 py-2 rounded-lg font-medium transition"
+              className="gradient-bg hover:opacity-90 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition shadow-lg shadow-purple-500/25"
             >
-              Get Started
+              Start Free
             </Link>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-gray-800/50 border border-gray-700 rounded-full px-4 py-1.5 mb-6">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-            <span className="text-sm text-gray-300">99.9% Uptime Guaranteed</span>
+      <section className="pt-28 pb-20 px-4 hero-gradient relative">
+        <div className="absolute top-20 left-1/4 w-72 h-72 bg-purple-600/20 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-10 right-1/4 w-60 h-60 bg-pink-500/15 rounded-full blur-[100px]"></div>
+
+        <div className="max-w-6xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 rounded-full px-4 py-1.5 mb-8">
+            <Sparkles className="w-4 h-4 text-amber-400" />
+            <span className="text-sm text-purple-200">India&apos;s #1 24/7 Live Streaming Platform</span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            Your Videos, Live <span className="gradient-text">24/7</span>
+
+          <h1 className="text-5xl md:text-7xl font-extrabold mb-6 leading-[1.1] tracking-tight">
+            Go Live <span className="gradient-text">24/7</span>
             <br />
-            Without Keeping Your PC On
+            <span className="text-gray-300 font-semibold text-4xl md:text-5xl">Without Your PC Running</span>
           </h1>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto mb-8">
-            Stream your pre-recorded videos non-stop on YouTube, Facebook, Twitch
-            and more. Cloud-powered. No hardware needed. Just upload and go live.
+
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+            Upload your videos once. We stream them non-stop to YouTube, Facebook,
+            Twitch — all from the cloud. No hardware. No hassle.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <Link
               href="/register"
-              className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-3.5 rounded-lg font-semibold text-lg transition flex items-center gap-2"
+              className="gradient-bg hover:opacity-90 text-white px-8 py-4 rounded-full font-semibold text-lg transition shadow-xl shadow-purple-500/30 flex items-center gap-2"
             >
-              <Play className="w-5 h-5" /> Start Streaming Free
+              Start Streaming Now <ArrowRight className="w-5 h-5" />
             </Link>
             <a
-              href="#features"
-              className="border border-gray-600 hover:border-gray-400 text-gray-300 px-8 py-3.5 rounded-lg font-medium transition"
+              href="#how-it-works"
+              className="border border-purple-700/50 hover:border-purple-500 text-purple-200 px-8 py-4 rounded-full font-medium transition backdrop-blur-sm"
             >
-              See How It Works
+              Watch Demo
             </a>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          {/* Platform Pills */}
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
             {[
-              { value: "99.9%", label: "Uptime SLA" },
-              { value: "24/7", label: "Non-Stop Streams" },
-              { value: "₹399", label: "Starting Price" },
-              { value: "1080p", label: "Full HD Quality" },
-            ].map((stat) => (
-              <div key={stat.label} className="glass rounded-xl p-4">
-                <div className="text-2xl font-bold text-cyan-400">{stat.value}</div>
-                <div className="text-sm text-gray-400">{stat.label}</div>
-              </div>
+              { name: "YouTube", color: "bg-red-500/10 border-red-500/30 text-red-300" },
+              { name: "Facebook", color: "bg-blue-500/10 border-blue-500/30 text-blue-300" },
+              { name: "Twitch", color: "bg-violet-500/10 border-violet-500/30 text-violet-300" },
+              { name: "Custom RTMP", color: "bg-amber-500/10 border-amber-500/30 text-amber-300" },
+            ].map((p) => (
+              <span key={p.name} className={`${p.color} border px-4 py-2 rounded-full text-sm font-medium`}>
+                {p.name}
+              </span>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Stream To Platforms */}
-      <section className="py-12 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-gray-400 mb-6">Stream to all major platforms</p>
-          <div className="flex flex-wrap items-center justify-center gap-8">
-            {["YouTube", "Facebook", "Twitch", "Custom RTMP"].map((platform) => (
-              <div key={platform} className="flex items-center gap-2 text-gray-300">
-                <Globe className="w-5 h-5 text-cyan-400" />
-                <span className="font-medium">{platform}</span>
+          {/* Stats Row */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+            {[
+              { value: "99.9%", label: "Uptime", icon: Zap },
+              { value: "24/7", label: "Non-Stop", icon: RefreshCw },
+              { value: "₹399", label: "From", icon: Star },
+              { value: "1080p", label: "Full HD", icon: Monitor },
+            ].map((stat) => (
+              <div key={stat.label} className="card p-4 text-center card-hover transition">
+                <stat.icon className="w-5 h-5 text-purple-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-white">{stat.value}</div>
+                <div className="text-xs text-gray-500 uppercase tracking-wider">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -114,30 +124,30 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 px-4 bg-gray-900/50">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Simple <span className="gradient-text">4-Step</span> Process
-          </h2>
-          <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
-            Get your live stream running in minutes, not hours
-          </p>
-          <div className="grid md:grid-cols-4 gap-6">
+      <section id="how-it-works" className="py-24 px-4 relative">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="text-purple-400 text-sm font-semibold uppercase tracking-wider">Simple Process</span>
+            <h2 className="text-4xl md:text-5xl font-bold mt-3">
+              Live in <span className="gradient-text">4 Steps</span>
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-4 gap-8">
             {[
-              { icon: Monitor, title: "Create Account", desc: "Sign up in 30 seconds with email or Google" },
-              { icon: Upload, title: "Upload Videos", desc: "Upload MP4, MOV, AVI, WebM to your gallery" },
-              { icon: Key, title: "Add Stream Key", desc: "Paste your YouTube/FB/Twitch stream key" },
-              { icon: Play, title: "Go Live!", desc: "Click start and your stream goes live 24/7" },
-            ].map((step, i) => (
-              <div key={step.title} className="relative text-center">
-                <div className="w-16 h-16 bg-cyan-500/10 border border-cyan-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <step.icon className="w-8 h-8 text-cyan-400" />
+              { icon: Monitor, title: "Sign Up", desc: "Create your free account in 30 seconds", num: "01" },
+              { icon: Upload, title: "Upload", desc: "Drop your MP4, MOV, AVI or WebM videos", num: "02" },
+              { icon: Key, title: "Connect", desc: "Add stream key from YouTube/Facebook/Twitch", num: "03" },
+              { icon: Play, title: "Go Live", desc: "Hit start — we handle the rest 24/7", num: "04" },
+            ].map((step) => (
+              <div key={step.title} className="card p-6 card-hover transition relative group">
+                <span className="absolute top-4 right-4 text-4xl font-black text-purple-500/10 group-hover:text-purple-500/20 transition">
+                  {step.num}
+                </span>
+                <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center mb-4">
+                  <step.icon className="w-6 h-6 text-purple-400" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-7 h-7 bg-cyan-500 rounded-full flex items-center justify-center text-sm font-bold md:right-auto md:left-1/2 md:-translate-x-1/2 md:-top-3">
-                  {i + 1}
-                </div>
-                <h3 className="font-semibold text-lg mb-2">{step.title}</h3>
-                <p className="text-gray-400 text-sm">{step.desc}</p>
+                <h3 className="font-bold text-lg mb-2">{step.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -145,30 +155,35 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section id="features" className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Powerful <span className="gradient-text">Features</span>
-          </h2>
-          <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
-            Everything you need to run a professional 24/7 live stream
-          </p>
+      <section id="features" className="py-24 px-4 bg-[#130e24]/50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="text-amber-400 text-sm font-semibold uppercase tracking-wider">Everything You Need</span>
+            <h2 className="text-4xl md:text-5xl font-bold mt-3">
+              Powerful <span className="gradient-text">Features</span>
+            </h2>
+            <p className="text-gray-400 mt-4 max-w-xl mx-auto">
+              Professional streaming tools that just work. No technical knowledge required.
+            </p>
+          </div>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { icon: Radio, title: "24/7 Non-Stop Streaming", desc: "Your stream runs continuously without any breaks. Automatic restart on failure." },
-              { icon: Monitor, title: "Pre-Recorded Goes Live", desc: "Upload videos and stream them as if you're live. No one can tell the difference." },
-              { icon: Globe, title: "Multi-Platform Support", desc: "Stream simultaneously to YouTube, Facebook, Twitch, and any Custom RTMP destination." },
-              { icon: RefreshCw, title: "Smart Auto-Restart", desc: "If stream drops, it auto-restarts within seconds. Loop mode ensures 24/7 uptime." },
-              { icon: Palette, title: "Stream Designer", desc: "Add logo watermarks, lower-thirds, custom overlays, and animated tickers." },
-              { icon: BarChart3, title: "Live Analytics", desc: "Track views, watch time, peak concurrent viewers, and estimated revenue." },
-              { icon: ListMusic, title: "Playlist Management", desc: "Create playlists, schedule videos, reorder with drag-drop, and loop content." },
-              { icon: Shield, title: "Secure & Reliable", desc: "Enterprise-grade infrastructure with 99.9% uptime SLA and encrypted stream keys." },
-              { icon: Smartphone, title: "Vertical Live (9:16)", desc: "Stream in vertical format for YouTube Shorts, Facebook Reels, and TikTok." },
+              { icon: RefreshCw, title: "24/7 Auto-Loop", desc: "Videos loop endlessly. Auto-restart on any failure within seconds.", color: "text-green-400 bg-green-500/10 border-green-500/20" },
+              { icon: Globe, title: "Multi-Platform", desc: "Stream to YouTube, Facebook, Twitch, and Custom RTMP simultaneously.", color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
+              { icon: Layers, title: "Stream Designer", desc: "Add logo watermarks, text overlays, lower-thirds, and animated tickers.", color: "text-pink-400 bg-pink-500/10 border-pink-500/20" },
+              { icon: BarChart3, title: "Live Analytics", desc: "Real-time views, watch time, peak viewers, and estimated revenue tracking.", color: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
+              { icon: ListMusic, title: "Playlist Mode", desc: "Queue videos, reorder with drag-drop, schedule content, and loop playlists.", color: "text-violet-400 bg-violet-500/10 border-violet-500/20" },
+              { icon: Shield, title: "Enterprise Secure", desc: "Encrypted stream keys, 99.9% SLA, enterprise-grade cloud infrastructure.", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
+              { icon: Smartphone, title: "Vertical Live", desc: "Stream 9:16 for YouTube Shorts, Facebook Reels, and TikTok Live.", color: "text-orange-400 bg-orange-500/10 border-orange-500/20" },
+              { icon: Zap, title: "Instant Swap", desc: "Change videos mid-stream without stopping. Zero downtime transitions.", color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20" },
+              { icon: Tv, title: "HD Quality", desc: "Stream in crystal-clear 720p or 1080p Full HD. Your choice per stream.", color: "text-rose-400 bg-rose-500/10 border-rose-500/20" },
             ].map((feature) => (
-              <div key={feature.title} className="glass rounded-xl p-6 hover:border-cyan-500/30 transition">
-                <feature.icon className="w-10 h-10 text-cyan-400 mb-4" />
+              <div key={feature.title} className="card p-6 card-hover transition">
+                <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-4 ${feature.color}`}>
+                  <feature.icon className="w-5 h-5" />
+                </div>
                 <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
-                <p className="text-gray-400 text-sm">{feature.desc}</p>
+                <p className="text-gray-400 text-sm leading-relaxed">{feature.desc}</p>
               </div>
             ))}
           </div>
@@ -176,177 +191,178 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-20 px-4 bg-gray-900/50">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Simple <span className="gradient-text">Pricing</span>
-          </h2>
-          <p className="text-gray-400 text-center mb-12">
-            Start free. Upgrade when you need more power.
-          </p>
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+      <section id="pricing" className="py-24 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="text-purple-400 text-sm font-semibold uppercase tracking-wider">Plans</span>
+            <h2 className="text-4xl md:text-5xl font-bold mt-3">
+              Simple <span className="gradient-text">Pricing</span>
+            </h2>
+            <p className="text-gray-400 mt-4">Start free. Scale as you grow.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto items-start">
             {/* Basic */}
-            <div className="glass rounded-2xl p-6 flex flex-col">
-              <h3 className="text-xl font-bold mb-1">Basic</h3>
-              <p className="text-sm text-gray-400 mb-4">Perfect for getting started</p>
+            <div className="card p-7 flex flex-col">
               <div className="mb-6">
-                <span className="text-4xl font-bold">₹559</span>
-                <span className="text-gray-400">/mo</span>
+                <h3 className="text-xl font-bold">Basic</h3>
+                <p className="text-sm text-gray-500 mt-1">For beginners</p>
+              </div>
+              <div className="mb-6">
+                <span className="text-4xl font-extrabold">₹559</span>
+                <span className="text-gray-500">/month</span>
               </div>
               <ul className="space-y-3 mb-8 flex-1">
                 {[
-                  "1 Live Streaming Channel",
+                  "1 Stream Slot",
                   "720p HD Quality",
-                  "2 GB Video Storage",
-                  "YouTube Platform",
-                  "Continuous Loop Streaming",
+                  "2 GB Storage",
+                  "YouTube Only",
+                  "24/7 Loop Mode",
                   "Swap Videos Anytime",
-                  "Easy Control Panel",
                   "Email Support",
                 ].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-green-400 shrink-0" />
+                  <li key={f} className="flex items-center gap-2.5 text-sm">
+                    <Check className="w-4 h-4 text-purple-400 shrink-0" />
                     <span className="text-gray-300">{f}</span>
-                  </li>
-                ))}
-                {["1080p Full HD", "Multi-Platform"].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm">
-                    <X className="w-4 h-4 text-gray-600 shrink-0" />
-                    <span className="text-gray-500">{f}</span>
                   </li>
                 ))}
               </ul>
               <Link
                 href="/register"
-                className="w-full border border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 py-3 rounded-lg font-medium text-center transition"
+                className="w-full border border-purple-500/50 text-purple-300 hover:bg-purple-500/10 py-3 rounded-full font-medium text-center transition"
               >
-                Choose Plan
+                Get Started
               </Link>
             </div>
 
             {/* Popular */}
-            <div className="relative glass rounded-2xl p-6 flex flex-col border-cyan-500/50">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-cyan-500 text-xs font-bold px-3 py-1 rounded-full">
-                MOST POPULAR
+            <div className="relative card p-7 flex flex-col border-purple-500/40 glow-purple">
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 gradient-bg text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+                BEST VALUE
               </div>
-              <h3 className="text-xl font-bold mb-1">Popular</h3>
-              <p className="text-sm text-gray-400 mb-4">Full HD + Multi-platform</p>
               <div className="mb-6">
-                <span className="text-4xl font-bold">₹699</span>
-                <span className="text-gray-400">/mo</span>
+                <h3 className="text-xl font-bold">Popular</h3>
+                <p className="text-sm text-gray-500 mt-1">Most chosen plan</p>
+              </div>
+              <div className="mb-6">
+                <span className="text-4xl font-extrabold">₹699</span>
+                <span className="text-gray-500">/month</span>
               </div>
               <ul className="space-y-3 mb-8 flex-1">
                 {[
-                  "1 Live Streaming Channel",
-                  "1080p Full HD Quality",
-                  "5 GB Video Storage",
+                  "1 Stream Slot",
+                  "1080p Full HD",
+                  "5 GB Storage",
                   "YouTube + Facebook",
-                  "Unlimited Loop Streaming",
-                  "Swap Videos Unlimited",
-                  "Schedule Streams",
-                  "Stream Designer (Logo + Lower-third)",
+                  "Unlimited 24/7 Loop",
+                  "Stream Designer",
                   "Auto-restart on Failure",
                   "Basic Analytics",
+                  "Schedule Streams",
                   "WhatsApp + Email Support",
                 ].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-green-400 shrink-0" />
+                  <li key={f} className="flex items-center gap-2.5 text-sm">
+                    <Check className="w-4 h-4 text-amber-400 shrink-0" />
                     <span className="text-gray-300">{f}</span>
                   </li>
                 ))}
               </ul>
               <Link
                 href="/register"
-                className="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-3 rounded-lg font-medium text-center transition"
+                className="w-full gradient-bg hover:opacity-90 text-white py-3 rounded-full font-semibold text-center transition shadow-lg shadow-purple-500/25"
               >
-                Choose Plan
+                Get Popular
               </Link>
             </div>
 
             {/* Custom */}
-            <div className="glass rounded-2xl p-6 flex flex-col">
-              <div className="absolute -top-3 right-4 bg-emerald-500 text-xs font-bold px-3 py-1 rounded-full">
-                FLEXIBLE
-              </div>
-              <h3 className="text-xl font-bold mb-1">Custom</h3>
-              <p className="text-sm text-gray-400 mb-4">Build your own plan</p>
+            <div className="card p-7 flex flex-col">
               <div className="mb-6">
-                <span className="text-4xl font-bold">₹399</span>
-                <span className="text-gray-400">/mo + add-ons</span>
+                <h3 className="text-xl font-bold">Custom</h3>
+                <p className="text-sm text-gray-500 mt-1">Build your own</p>
+              </div>
+              <div className="mb-6">
+                <span className="text-4xl font-extrabold">₹399</span>
+                <span className="text-gray-500">/slot + extras</span>
               </div>
               <ul className="space-y-3 mb-8 flex-1">
                 {[
-                  "Start from 1 Channel",
-                  "Choose 720p / 1080p",
-                  "Storage: 1 GB to 25 GB",
-                  "YouTube, Facebook, Twitch, RTMP",
-                  "Add Extra Stream Slots",
-                  "Auto-restart on Failure",
-                  "Continuous Loop Streaming",
-                  "Schedule Streams",
-                  "Swap Videos Anytime",
+                  "1-10 Stream Slots",
+                  "720p or 1080p",
+                  "1 GB to 25 GB Storage",
+                  "All Platforms + RTMP",
+                  "Flexible Billing",
+                  "Auto-restart",
+                  "Priority Support",
                 ].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-green-400 shrink-0" />
+                  <li key={f} className="flex items-center gap-2.5 text-sm">
+                    <Check className="w-4 h-4 text-purple-400 shrink-0" />
                     <span className="text-gray-300">{f}</span>
                   </li>
                 ))}
               </ul>
               <Link
                 href="/register"
-                className="w-full border border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 py-3 rounded-lg font-medium text-center transition"
+                className="w-full border border-purple-500/50 text-purple-300 hover:bg-purple-500/10 py-3 rounded-full font-medium text-center transition"
               >
-                Choose Plan
+                Build Plan
               </Link>
             </div>
           </div>
-          <p className="text-center text-gray-500 text-sm mt-6">
-            * Prices exclusive of 18% GST. Payments secured by Razorpay.
+
+          <p className="text-center text-gray-600 text-sm mt-8">
+            All prices exclusive of 18% GST • Secured by Razorpay
           </p>
         </div>
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="py-20 px-4">
+      <section id="faq" className="py-24 px-4 bg-[#130e24]/50">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Frequently Asked <span className="gradient-text">Questions</span>
-          </h2>
-          <div className="space-y-4">
+          <div className="text-center mb-16">
+            <span className="text-amber-400 text-sm font-semibold uppercase tracking-wider">Questions</span>
+            <h2 className="text-4xl md:text-5xl font-bold mt-3">
+              Common <span className="gradient-text">FAQs</span>
+            </h2>
+          </div>
+          <div className="space-y-3">
             {[
-              { q: "How does 24/7 live streaming work?", a: "You upload pre-recorded videos to our platform, add your YouTube/Facebook stream key, and we stream your videos continuously in a loop — 24 hours a day, 7 days a week. Our servers handle everything." },
-              { q: "Do I need to keep my computer on?", a: "No! Everything runs on our cloud servers. Once you set up your stream, it runs independently. You can close your browser and your stream continues." },
-              { q: "Which platforms are supported?", a: "We support YouTube, Facebook, Twitch, and any platform that accepts Custom RTMP streams. You can even stream to multiple platforms simultaneously." },
-              { q: "What video formats can I upload?", a: "We support MP4, MOV, AVI, and WebM formats. Videos are processed on our servers for optimal streaming quality." },
-              { q: "What happens if my stream drops?", a: "Our smart auto-restart feature detects stream failures and automatically restarts within seconds, ensuring minimal downtime." },
-              { q: "Can I change videos while streaming?", a: "Yes! You can swap videos anytime without stopping your stream. The new video will start playing immediately." },
-              { q: "Is there a free trial?", a: "Yes, we offer a free plan with 1 GB storage, 720p quality, and 2 hours/day streaming so you can test our platform." },
-              { q: "How secure is my stream key?", a: "Stream keys are encrypted and stored securely. We never share your credentials with third parties." },
+              { q: "How does 24/7 live streaming work?", a: "Upload pre-recorded videos, paste your stream key, and we loop them on your YouTube/Facebook channel non-stop. Our cloud servers handle everything — you can close your browser." },
+              { q: "Do I need to keep my computer running?", a: "No! Everything runs on our servers. Once you start a stream, it runs independently 24/7 without any hardware from your side." },
+              { q: "Which platforms are supported?", a: "YouTube, Facebook, Twitch, and any Custom RTMP destination. Multi-platform streaming lets you go live on all of them simultaneously." },
+              { q: "What video formats are accepted?", a: "We accept MP4, MOV, AVI, and WebM. Videos are processed on our servers for optimal streaming quality." },
+              { q: "What if my stream disconnects?", a: "Smart auto-restart detects failures and restarts within seconds. Your stream stays live 24/7 with minimal interruption." },
+              { q: "Can I swap videos without stopping?", a: "Yes! Change your playlist anytime without stopping the stream. The new content plays immediately." },
+              { q: "Is there a free trial?", a: "Yes — our free plan gives you 1 GB storage, 720p quality, and 2 hours/day streaming to test everything out." },
+              { q: "How safe are my stream keys?", a: "Stream keys are encrypted end-to-end. We never share credentials with third parties." },
             ].map((faq) => (
-              <details key={faq.q} className="glass rounded-xl p-5 group">
-                <summary className="flex items-center justify-between cursor-pointer list-none">
-                  <span className="font-medium">{faq.q}</span>
-                  <ChevronDown className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" />
+              <details key={faq.q} className="card p-5 group cursor-pointer">
+                <summary className="flex items-center justify-between list-none">
+                  <span className="font-medium pr-4">{faq.q}</span>
+                  <ChevronDown className="w-5 h-5 text-purple-400 group-open:rotate-180 transition-transform shrink-0" />
                 </summary>
-                <p className="text-gray-400 mt-3 text-sm">{faq.a}</p>
+                <p className="text-gray-400 mt-4 text-sm leading-relaxed border-t border-purple-900/30 pt-4">{faq.a}</p>
               </details>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Contact */}
-      <section id="contact" className="py-20 px-4 bg-gray-900/50">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to <span className="gradient-text">Go Live</span>?
+      {/* CTA */}
+      <section className="py-24 px-4 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-900/10 to-transparent"></div>
+        <div className="max-w-3xl mx-auto text-center relative z-10">
+          <Sparkles className="w-10 h-10 text-amber-400 mx-auto mb-4" />
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            Ready to Stream?
           </h2>
-          <p className="text-gray-400 mb-8">
-            Start streaming today. No credit card required for the free plan.
+          <p className="text-gray-400 text-lg mb-8">
+            Join thousands of creators streaming 24/7. Free to start.
           </p>
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-lg font-semibold text-lg transition"
+            className="inline-flex items-center gap-2 gradient-bg hover:opacity-90 text-white px-10 py-4 rounded-full font-semibold text-lg transition shadow-xl shadow-purple-500/30"
           >
             <Play className="w-5 h-5" /> Get Started Free
           </Link>
@@ -354,44 +370,46 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-800 py-12 px-4">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8">
+      <footer className="border-t border-purple-900/30 py-12 px-4 bg-[#0a0716]">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Radio className="w-6 h-6 text-cyan-400" />
-              <span className="font-bold text-lg">IntubeMedia.live</span>
+              <div className="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
+                <Tv className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-bold text-lg">intubemedia</span>
             </div>
-            <p className="text-gray-400 text-sm">
-              The best 24/7 pre-recorded video live streaming platform. Stream non-stop and grow your channel.
+            <p className="text-gray-500 text-sm leading-relaxed">
+              The most reliable 24/7 live streaming platform for creators. Stream non-stop, grow your channel.
             </p>
           </div>
           <div>
-            <h4 className="font-semibold mb-3">Product</h4>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li><a href="#features" className="hover:text-white transition">Features</a></li>
-              <li><a href="#pricing" className="hover:text-white transition">Pricing</a></li>
-              <li><Link href="/login" className="hover:text-white transition">Dashboard</Link></li>
+            <h4 className="font-semibold mb-4 text-gray-200">Product</h4>
+            <ul className="space-y-2.5 text-sm text-gray-500">
+              <li><a href="#features" className="hover:text-purple-400 transition">Features</a></li>
+              <li><a href="#pricing" className="hover:text-purple-400 transition">Pricing</a></li>
+              <li><Link href="/login" className="hover:text-purple-400 transition">Dashboard</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-3">Support</h4>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li><a href="#faq" className="hover:text-white transition">FAQ</a></li>
-              <li><a href="#contact" className="hover:text-white transition">Contact Us</a></li>
-              <li><a href="#" className="hover:text-white transition">Tutorial</a></li>
+            <h4 className="font-semibold mb-4 text-gray-200">Support</h4>
+            <ul className="space-y-2.5 text-sm text-gray-500">
+              <li><a href="#faq" className="hover:text-purple-400 transition">FAQ</a></li>
+              <li><a href="#" className="hover:text-purple-400 transition">Contact</a></li>
+              <li><a href="#" className="hover:text-purple-400 transition">Help Center</a></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-3">Legal</h4>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li><a href="#" className="hover:text-white transition">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-white transition">Refund Policy</a></li>
+            <h4 className="font-semibold mb-4 text-gray-200">Legal</h4>
+            <ul className="space-y-2.5 text-sm text-gray-500">
+              <li><a href="#" className="hover:text-purple-400 transition">Privacy</a></li>
+              <li><a href="#" className="hover:text-purple-400 transition">Terms</a></li>
+              <li><a href="#" className="hover:text-purple-400 transition">Refund Policy</a></li>
             </ul>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-gray-800 text-center text-sm text-gray-500">
-          © 2026 IntubeMedia.live. All rights reserved.
+        <div className="max-w-6xl mx-auto mt-10 pt-8 border-t border-purple-900/20 text-center text-sm text-gray-600">
+          © 2026 IntubeMedia.live — All rights reserved.
         </div>
       </footer>
     </div>
