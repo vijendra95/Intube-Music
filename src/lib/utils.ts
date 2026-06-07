@@ -12,12 +12,13 @@ export function formatNumber(num: number): string {
 }
 
 export function slugify(text: string): string {
-  return text
+  const slug = text
     .toLowerCase()
     .replace(/[^\w\s-]/g, '')
     .replace(/[\s_]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .substring(0, 100);
+  return slug || 'track';
 }
 
 export function cn(...classes: (string | boolean | undefined | null)[]): string {
