@@ -287,7 +287,9 @@ export default function UploadMusicPage() {
     } catch (err) {
       console.error('Upload error:', err);
       setUploadStatus('error');
-      setUploadMessage(err instanceof Error ? err.message : 'Upload failed. Please try again.');
+      const msg = err instanceof Error ? err.message : 'Upload failed. Please try again.';
+      setUploadMessage(msg);
+      alert('Upload error: ' + msg);
     } finally {
       setIsUploading(false);
     }
@@ -298,7 +300,7 @@ export default function UploadMusicPage() {
       <h1 className="text-2xl font-bold text-white mb-2">Upload Music</h1>
       <p className="text-[#8888aa] mb-8">Upload new tracks to make them available on Intube Music</p>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} noValidate className="space-y-8">
         {/* Release Type */}
         <div>
           <label className="block text-sm font-medium text-white mb-3">Release Type</label>
@@ -332,7 +334,6 @@ export default function UploadMusicPage() {
               onChange={(e) => setAlbumTitle(e.target.value)}
               placeholder="Enter title..."
               className="w-full px-4 py-2.5 bg-[#2a2a4a] border border-[#3a3a5a] rounded-lg text-white placeholder-[#6666aa] focus:outline-none focus:border-[var(--color-primary)] transition-colors"
-              required
             />
           </div>
 
@@ -350,7 +351,7 @@ export default function UploadMusicPage() {
                 }
               }}
               className="w-full px-4 py-2.5 bg-[#2a2a4a] border border-[#3a3a5a] rounded-lg text-white focus:outline-none focus:border-[var(--color-primary)] transition-colors"
-              required={!showNewArtist}
+              // validated manually in handleSubmit
             >
               <option value="">Select Artist...</option>
               {artists.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
@@ -437,7 +438,6 @@ export default function UploadMusicPage() {
               value={genre}
               onChange={(e) => setGenre(e.target.value)}
               className="w-full px-4 py-2.5 bg-[#2a2a4a] border border-[#3a3a5a] rounded-lg text-white focus:outline-none focus:border-[var(--color-primary)] transition-colors"
-              required
             >
               <option value="">Select Genre...</option>
               <option value="bollywood">Bollywood</option>
