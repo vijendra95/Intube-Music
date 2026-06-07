@@ -123,7 +123,7 @@ export default function Player() {
   const progressPercent = duration > 0 ? (progress / duration) * 100 : 0;
   const upNext = queue.slice(queueIndex + 1, queueIndex + 11);
 
-  // Expanded full-screen player
+  // Expanded half-screen player (sidebar stays visible)
   if (expanded) {
     return (
       <>
@@ -133,9 +133,9 @@ export default function Player() {
           onLoadedMetadata={handleLoadedMetadata}
           onEnded={handleEnded}
         />
-        <div className="fixed inset-0 z-50 bg-gradient-to-b from-[#1a1a2e] via-[#0d0d1a] to-[#000] flex flex-col overflow-y-auto">
+        <div className="fixed inset-0 md:left-72 z-50 bg-gradient-to-b from-[#1a1a2e] via-[#0d0d1a] to-[#000] flex flex-col overflow-y-auto">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center justify-between px-6 py-3">
             <button onClick={() => setExpanded(false)} className="text-white/70 hover:text-white">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
             </button>
@@ -143,27 +143,27 @@ export default function Player() {
             <div className="w-6" />
           </div>
 
-          {/* Cover Art */}
-          <div className="flex-shrink-0 flex justify-center px-8 py-4">
-            <div className={`w-72 h-72 md:w-80 md:h-80 rounded-2xl overflow-hidden shadow-2xl shadow-black/60 ${isPlaying ? 'animate-spin-slow' : ''}`} style={{borderRadius: isPlaying ? '50%' : '1rem'}}>
+          {/* Cover Art — smaller for half screen */}
+          <div className="flex-shrink-0 flex justify-center px-6 py-2">
+            <div className={`w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden shadow-2xl shadow-black/60 ${isPlaying ? 'animate-spin-slow' : ''}`} style={{borderRadius: isPlaying ? '50%' : '1rem'}}>
               {(currentTrack.coverUrl || currentTrack.album?.artwork) ? (
                 <img src={(currentTrack.coverUrl || currentTrack.album?.artwork)!} alt="" className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1ed760]/20 to-[#1ed760]/5">
-                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#1ed760" strokeWidth="1"><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></svg>
+                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#1ed760" strokeWidth="1"><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></svg>
                 </div>
               )}
             </div>
           </div>
 
           {/* Track Info */}
-          <div className="px-8 mt-4 text-center">
-            <h2 className="text-2xl font-bold text-white truncate">{currentTrack.title}</h2>
-            <p className="text-base text-[#b3b3b3] mt-1">{currentTrack.artist?.name}</p>
+          <div className="px-6 mt-2 text-center">
+            <h2 className="text-xl font-bold text-white truncate">{currentTrack.title}</h2>
+            <p className="text-sm text-[#b3b3b3] mt-1">{currentTrack.artist?.name}</p>
           </div>
 
           {/* Progress Bar */}
-          <div className="px-8 mt-6">
+          <div className="px-6 mt-4">
             <div
               onClick={handleProgressClick}
               className="w-full h-[6px] bg-[#3e3e3e] rounded-full cursor-pointer group relative"
@@ -172,21 +172,21 @@ export default function Player() {
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-md" />
               </div>
             </div>
-            <div className="flex justify-between mt-2">
+            <div className="flex justify-between mt-1.5">
               <span className="text-xs text-[#b3b3b3]">{formatDuration(Math.floor(progress))}</span>
               <span className="text-xs text-[#b3b3b3]">{formatDuration(Math.floor(duration))}</span>
             </div>
           </div>
 
           {/* Controls */}
-          <div className="flex items-center justify-center gap-8 mt-4 px-8">
+          <div className="flex items-center justify-center gap-7 mt-3 px-6">
             <button onClick={toggleShuffle} className={`${shuffle ? 'text-[#1ed760]' : 'text-white/60'} hover:text-white`}>
               <ShuffleIcon />
             </button>
             <button onClick={prevTrack} className="text-white/80 hover:text-white">
               <PrevIcon />
             </button>
-            <button onClick={togglePlay} className="w-16 h-16 bg-white rounded-full flex items-center justify-center hover:scale-105 transition-transform">
+            <button onClick={togglePlay} className="w-14 h-14 bg-white rounded-full flex items-center justify-center hover:scale-105 transition-transform">
               {isPlaying ? <PauseIcon /> : <PlayIcon />}
             </button>
             <button onClick={nextTrack} className="text-white/80 hover:text-white">
@@ -198,16 +198,16 @@ export default function Player() {
             </button>
           </div>
 
-          {/* Up Next / Suggested */}
+          {/* Up Next / Suggested Songs */}
           {upNext.length > 0 && (
-            <div className="px-6 mt-8 pb-8">
-              <h3 className="text-lg font-semibold text-white mb-3">Up Next</h3>
-              <div className="space-y-1">
+            <div className="px-5 mt-5 pb-6">
+              <h3 className="text-base font-semibold text-white mb-2">Up Next</h3>
+              <div className="space-y-0.5">
                 {upNext.map((track, i) => (
                   <div
                     key={track.id + '-' + i}
                     onClick={() => setQueue(queue, queueIndex + 1 + i)}
-                    className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
                   >
                     <div className="w-10 h-10 rounded-lg overflow-hidden bg-[#282828] flex-shrink-0">
                       {(track.coverUrl || track.album?.artwork) ? (

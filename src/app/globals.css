@@ -100,5 +100,5 @@ body {
 }
 
 .animate-spin-slow {
-  animation: spin-slow 8s linear infinite;
+  animation: spin-slow 20s linear infinite;
 }
