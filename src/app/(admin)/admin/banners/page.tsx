@@ -42,6 +42,35 @@ export default function BannersPage() {
     }
   };
 
+  const handleDeleteBanner = async (id: string, title: string) => {
+    if (!confirm(`Delete banner "${title}"? This cannot be undone.`)) return;
+    try {
+      const res = await fetch(`/api/banners/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        loadBanners();
+      } else {
+        alert('Failed to delete banner');
+      }
+    } catch {
+      alert('Network error');
+    }
+  };
+
+  const handleToggleBanner = async (id: string, currentActive: boolean) => {
+    try {
+      const res = await fetch(`/api/banners/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: !currentActive }),
+      });
+      if (res.ok) {
+        loadBanners();
+      }
+    } catch {
+      alert('Network error');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.image) {
@@ -207,6 +236,20 @@ export default function BannersPage() {
                 <img src={banner.imageUrl} alt={banner.title} className="w-full h-40 object-cover" />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
                   <p className="text-white font-medium">{banner.title}</p>
+                </div>
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <button
+                    onClick={() => handleDeleteBanner(banner.id, banner.title)}
+                    className="px-3 py-1.5 bg-red-600/90 text-white text-xs font-medium rounded hover:bg-red-700"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    onClick={() => handleToggleBanner(banner.id, banner.isActive)}
+                    className={`px-3 py-1.5 text-white text-xs font-medium rounded ${banner.isActive ? 'bg-yellow-600/90 hover:bg-yellow-700' : 'bg-green-600/90 hover:bg-green-700'}`}
+                  >
+                    {banner.isActive ? 'Disable' : 'Enable'}
+                  </button>
                 </div>
               </div>
             ))}

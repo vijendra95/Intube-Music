@@ -21,10 +21,12 @@ interface ArtistData {
   genres: string | null;
   verified: boolean;
   country: string | null;
+  bio: string | null;
 }
 
 export default function ArtistsPage() {
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [artists, setArtists] = useState<ArtistData[]>([]);
   const [form, setForm] = useState<ArtistForm>({
     name: '',
@@ -49,12 +51,56 @@ export default function ArtistsPage() {
 
   useEffect(() => { loadArtists(); }, []);
 
+  const resetForm = () => {
+    setForm({ name: '', bio: '', country: 'India', genres: [], avatar: null, coverImage: null, instagram: '', youtube: '', spotify: '', labelId: '' });
+    setEditingId(null);
+    setShowForm(false);
+  };
+
+  const startEdit = (artist: ArtistData) => {
+    setEditingId(artist.id);
+    let genres: string[] = [];
+    if (artist.genres) {
+      try { genres = JSON.parse(artist.genres); } catch { genres = []; }
+    }
+    setForm({
+      name: artist.name,
+      bio: artist.bio || '',
+      country: artist.country || 'India',
+      genres,
+      avatar: null,
+      coverImage: null,
+      instagram: '',
+      youtube: '',
+      spotify: '',
+      labelId: '',
+    });
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Delete artist "${name}"? This cannot be undone.`)) return;
+    try {
+      const res = await fetch(`/api/artists/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        loadArtists();
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Failed to delete');
+      }
+    } catch {
+      alert('Network error');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     try {
-      const res = await fetch('/api/artists', {
-        method: 'POST',
+      const url = editingId ? `/api/artists/${editingId}` : '/api/artists';
+      const method = editingId ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: form.name,
@@ -66,12 +112,11 @@ export default function ArtistsPage() {
         }),
       });
       if (res.ok) {
-        setShowForm(false);
-        setForm({ name: '', bio: '', country: 'India', genres: [], avatar: null, coverImage: null, instagram: '', youtube: '', spotify: '', labelId: '' });
+        resetForm();
         loadArtists();
       } else {
         const err = await res.json();
-        alert(err.error || 'Failed to create artist');
+        alert(err.error || 'Failed to save artist');
       }
     } catch {
       alert('Network error');
@@ -88,17 +133,16 @@ export default function ArtistsPage() {
           <p className="text-[#8888aa] text-sm mt-1">Manage all artists on the platform</p>
         </div>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => { resetForm(); setShowForm(!showForm); }}
           className="px-4 py-2.5 bg-[var(--color-primary)] text-black font-semibold text-sm rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors"
         >
           + Add Artist
         </button>
       </div>
 
-      {/* Add Artist Form */}
       {showForm && (
         <div className="bg-[#1a1a2e] border border-[#2a2a4a] rounded-xl p-6 mb-6">
-          <h2 className="text-lg font-semibold text-white mb-4">Add New Artist</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">{editingId ? 'Edit Artist' : 'Add New Artist'}</h2>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-white mb-1">Artist Name *</label>
@@ -129,20 +173,11 @@ export default function ArtistsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white mb-1">Label</label>
-              <select
-                value={form.labelId}
-                onChange={(e) => setForm({ ...form, labelId: e.target.value })}
-                className="w-full px-3 py-2 bg-[#2a2a4a] border border-[#3a3a5a] rounded-lg text-white text-sm focus:outline-none focus:border-[var(--color-primary)]"
-              >
-                <option value="">Independent</option>
-              </select>
-            </div>
-            <div>
               <label className="block text-sm font-medium text-white mb-1">Genres</label>
               <input
                 type="text"
                 placeholder="e.g. Pop, Bollywood, Hip Hop"
+                value={form.genres.join(', ')}
                 onChange={(e) => setForm({ ...form, genres: e.target.value.split(',').map(g => g.trim()) })}
                 className="w-full px-3 py-2 bg-[#2a2a4a] border border-[#3a3a5a] rounded-lg text-white text-sm focus:outline-none focus:border-[var(--color-primary)]"
               />
@@ -167,35 +202,17 @@ export default function ArtistsPage() {
                 className="w-full px-3 py-2 bg-[#2a2a4a] border border-[#3a3a5a] rounded-lg text-white text-sm focus:outline-none focus:border-[var(--color-primary)]"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-white mb-1">Profile Picture</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setForm({ ...form, avatar: e.target.files?.[0] || null })}
-                className="text-xs text-[#8888aa] file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:bg-[#3a3a5a] file:text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-white mb-1">Cover Image</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setForm({ ...form, coverImage: e.target.files?.[0] || null })}
-                className="text-xs text-[#8888aa] file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:bg-[#3a3a5a] file:text-white"
-              />
-            </div>
             <div className="md:col-span-2 flex gap-3 mt-2">
               <button
                 type="submit"
                 disabled={saving}
                 className="px-5 py-2.5 bg-[var(--color-primary)] text-black font-semibold text-sm rounded-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50"
               >
-                {saving ? 'Saving...' : 'Save Artist'}
+                {saving ? 'Saving...' : (editingId ? 'Update Artist' : 'Save Artist')}
               </button>
               <button
                 type="button"
-                onClick={() => setShowForm(false)}
+                onClick={resetForm}
                 className="px-5 py-2.5 bg-[#2a2a4a] text-white text-sm rounded-lg hover:bg-[#3a3a5a]"
               >
                 Cancel
@@ -205,7 +222,6 @@ export default function ArtistsPage() {
         </div>
       )}
 
-      {/* Artists List */}
       <div className="bg-[#1a1a2e] border border-[#2a2a4a] rounded-xl overflow-hidden">
         {artists.length === 0 ? (
           <div className="text-center py-16 text-[#8888aa]">
@@ -221,6 +237,7 @@ export default function ArtistsPage() {
                 <th className="px-6 py-3">Country</th>
                 <th className="px-6 py-3">Genres</th>
                 <th className="px-6 py-3">Status</th>
+                <th className="px-6 py-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -228,11 +245,27 @@ export default function ArtistsPage() {
                 <tr key={artist.id} className="border-b border-[#2a2a4a] hover:bg-[#2a2a4a]/50">
                   <td className="px-6 py-4 text-white font-medium">{artist.name}</td>
                   <td className="px-6 py-4 text-[#8888aa] text-sm">{artist.country || '-'}</td>
-                  <td className="px-6 py-4 text-[#8888aa] text-sm">{artist.genres ? (typeof artist.genres === 'string' ? JSON.parse(artist.genres).join(', ') : '') : '-'}</td>
+                  <td className="px-6 py-4 text-[#8888aa] text-sm">
+                    {artist.genres ? (() => { try { return JSON.parse(artist.genres).join(', '); } catch { return '-'; } })() : '-'}
+                  </td>
                   <td className="px-6 py-4">
                     <span className={`text-xs px-2 py-1 rounded ${artist.verified ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}>
                       {artist.verified ? 'Verified' : 'Active'}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <button
+                      onClick={() => startEdit(artist)}
+                      className="text-xs px-3 py-1.5 bg-blue-500/10 text-blue-400 rounded hover:bg-blue-500/20 mr-2"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(artist.id, artist.name)}
+                      className="text-xs px-3 py-1.5 bg-red-500/10 text-red-400 rounded hover:bg-red-500/20"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
