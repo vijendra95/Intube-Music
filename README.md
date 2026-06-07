@@ -1,81 +1,36 @@
-# IntubeMedia.live - 24/7 YouTube Live Streaming Platform
-
-Stream your pre-recorded videos 24/7 on YouTube, Facebook, Twitch and more — without keeping your PC on.
-
-## Features
-
-- **24/7 Non-Stop Streaming** — Loop pre-recorded videos continuously as live streams
-- **Multi-Platform** — YouTube, Facebook, Twitch, Custom RTMP simultaneously
-- **Video Gallery** — Upload MP4, MOV, AVI, WebM with drag-and-drop
-- **Stream Designer** — Logo watermarks, overlays, lower-thirds
-- **Smart Auto-Restart** — Automatic restart on failure
-- **Live Analytics** — Views, watch time, concurrent viewers
-- **Subscription Plans** — Basic (₹559/mo), Popular (₹699/mo), Custom (₹399+)
-- **Referral System** — Earn 10% commission on referrals
-- **Admin Panel** — User management, stream health monitoring
-- **Mobile-First** — Fully responsive dark-themed design
-
-## Tech Stack
-
-- **Frontend:** Next.js 16, TypeScript, TailwindCSS, Lucide Icons
-- **Backend:** Node.js, Express, MongoDB, Mongoose
-- **Streaming:** FFmpeg, RTMP
-- **Payments:** Razorpay
-- **Auth:** JWT, Google OAuth
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
-### Prerequisites
-
-- Node.js 20+
-- MongoDB
-- FFmpeg
-
-### Setup
+First, run the development server:
 
 ```bash
-# Frontend
-cd frontend
-npm install
 npm run dev
-
-# Backend
-cd backend
-cp .env.example .env
-npm install
-node server.js
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-### Docker
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-```bash
-docker-compose up -d
-```
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## Project Structure
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-```
-intubemedia-live/
-├── frontend/              Next.js app
-│   ├── src/app/
-│   │   ├── page.tsx            Landing page
-│   │   ├── (auth)/            Login, Register, Forgot Password
-│   │   ├── dashboard/         User dashboard
-│   │   │   ├── videos/        Video gallery
-│   │   │   ├── streams/       Live streams
-│   │   │   ├── subscription/  Plans
-│   │   │   ├── referral/      Referral & Earn
-│   │   │   ├── payments/      Payment history
-│   │   │   └── settings/      Account settings
-│   │   └── admin/             Admin panel
-├── backend/               Express API
-│   ├── routes/            API routes
-│   ├── models/            MongoDB schemas
-│   ├── middleware/        Auth middleware
-│   └── services/          FFmpeg, RTMP, Payments
-└── docker-compose.yml
-```
+## Learn More
 
-## License
+To learn more about Next.js, take a look at the following resources:
 
-Private — All rights reserved.
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #000000;
+  --color-foreground: #ffffff;
+  --color-primary: #1ed760;
+  --color-primary-hover: #1db954;
+  --color-surface: #121212;
+  --color-surface-hover: #1a1a1a;
+  --color-surface-light: #282828;
+  --color-surface-lighter: #333333;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #b3b3b3;
+  --color-text-muted: #727272;
+  --color-border: #282828;
+  --color-accent: #e91e63;
+  --font-sans: var(--font-inter);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #535353 transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #535353;
+  border-radius: 4px;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  overflow: hidden;
+}
+
+/* Player gradient */
+.player-gradient {
+  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
+}
+
+/* Hover card effect */
+.card-hover {
+  transition: background-color 0.3s ease;
+}
+.card-hover:hover {
+  background-color: var(--color-surface-hover);
+}
+
+/* Animated gradient for premium badge */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.premium-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* Pulse animation for now playing */
+@keyframes pulse-dot {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
+.now-playing-bar {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.now-playing-bar span {
+  width: 3px;
+  background: var(--color-primary);
+  border-radius: 1px;
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+.now-playing-bar span:nth-child(2) { animation-delay: 0.2s; }
+.now-playing-bar span:nth-child(3) { animation-delay: 0.4s; }
+.now-playing-bar span:nth-child(4) { animation-delay: 0.6s; }
