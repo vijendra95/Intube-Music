@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1ed760;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#00d4aa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0099ff;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffa500;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Outer circle -->
+  <circle cx="100" cy="100" r="90" fill="url(#grad1)" opacity="0.15"/>
+  <circle cx="100" cy="100" r="90" stroke="url(#grad1)" stroke-width="3" fill="none"/>
+  <!-- Inner hexagonal shape -->
+  <path d="M100 25 L160 60 L160 140 L100 175 L40 140 L40 60 Z" fill="url(#grad1)" opacity="0.1" stroke="url(#grad1)" stroke-width="1.5"/>
+  <!-- Play button triangle -->
+  <path d="M80 65 L140 100 L80 135 Z" fill="url(#grad1)" opacity="0.9"/>
+  <!-- Sound waves -->
+  <path d="M150 75 C165 85 165 115 150 125" stroke="url(#grad2)" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M158 65 C178 80 178 120 158 135" stroke="url(#grad2)" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+  <!-- Music note accent -->
+  <circle cx="55" cy="145" r="6" fill="url(#grad2)" opacity="0.8"/>
+  <line x1="61" y1="145" x2="61" y2="120" stroke="url(#grad2)" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+  <path d="M61 120 C61 115 72 112 72 117" stroke="url(#grad2)" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.8"/>
+</svg>
