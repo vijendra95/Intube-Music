@@ -36,13 +36,13 @@ export default function UploadMusicPage() {
   const [creatingLabel, setCreatingLabel] = useState(false);
 
   const loadArtists = () => {
-    fetch('/api/artists').then(r => r.json()).then(data => {
+    fetch('/api/artists?limit=100').then(r => r.json()).then(data => {
       const list = Array.isArray(data) ? data : (data.artists || []);
       setArtists(list);
     }).catch(() => {});
   };
   const loadLabels = () => {
-    fetch('/api/labels').then(r => r.json()).then(data => {
+    fetch('/api/labels?limit=100').then(r => r.json()).then(data => {
       const list = Array.isArray(data) ? data : (data.labels || []);
       setLabels(list);
     }).catch(() => {});
@@ -151,13 +151,15 @@ export default function UploadMusicPage() {
 
     // Refresh artist list to ensure selected artist still exists
     try {
-      const res = await fetch('/api/artists');
+      const res = await fetch('/api/artists?limit=100');
       const data = await res.json();
       const list = Array.isArray(data) ? data : (data.artists || []);
       setArtists(list);
       if (!list.some((a: ArtistOption) => a.id === artistId)) {
+        setArtistId('');
         setUploadStatus('error');
-        setUploadMessage('Selected artist no longer exists. Please select another artist.');
+        setUploadMessage('Selected artist no longer exists. The artist list has been refreshed — please select a valid artist and try again.');
+        setIsUploading(false);
         return;
       }
     } catch { /* continue with upload */ }

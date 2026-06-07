@@ -1,9 +1,23 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/ui/Logo';
+
+const moodList = [
+  { name: 'Happy', emoji: '\u{1F60A}' },
+  { name: 'Romantic', emoji: '\u{2764}\u{FE0F}' },
+  { name: 'Sad', emoji: '\u{1F622}' },
+  { name: 'Party', emoji: '\u{1F389}' },
+  { name: 'Chill', emoji: '\u{1F60C}' },
+  { name: 'Focus', emoji: '\u{1F3AF}' },
+  { name: 'Workout', emoji: '\u{1F4AA}' },
+  { name: 'Sleep', emoji: '\u{1F319}' },
+  { name: 'Devotional', emoji: '\u{1F64F}' },
+  { name: 'Motivational', emoji: '\u{1F525}' },
+];
 
 const navItems = [
   { href: '/', label: 'Home', icon: HomeIcon },
@@ -22,6 +36,8 @@ const libraryItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [moodOpen, setMoodOpen] = useState(false);
 
   return (
     <>
@@ -55,6 +71,37 @@ export default function Sidebar() {
               </Link>
             );
           })}
+
+          {/* Mood - collapsible */}
+          <button
+            onClick={() => setMoodOpen(!moodOpen)}
+            className={cn(
+              'w-full flex items-center gap-4 px-4 py-3 rounded-xl text-base font-medium transition-all',
+              moodOpen
+                ? 'text-white bg-[var(--color-surface-light)]'
+                : 'text-[var(--color-text-secondary)] hover:text-white hover:bg-[var(--color-surface)]/50'
+            )}
+          >
+            <MoodIcon active={moodOpen} />
+            Mood
+            <svg className={`w-4 h-4 ml-auto transition-transform ${moodOpen ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          {moodOpen && (
+            <div className="ml-4 mt-1 space-y-0.5 max-h-[300px] overflow-y-auto">
+              {moodList.map((mood) => (
+                <button
+                  key={mood.name}
+                  onClick={() => router.push(`/browse?mood=${mood.name.toLowerCase()}`)}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left text-sm text-[var(--color-text-secondary)] hover:text-white hover:bg-[var(--color-surface)]/50 transition-all"
+                >
+                  <span>{mood.emoji}</span>
+                  <span>{mood.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </nav>
 
         {/* Divider */}
@@ -223,6 +270,17 @@ function UserIcon() {
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
+function MoodIcon({ active }: { active?: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+      <line x1="9" y1="9" x2="9.01" y2="9" />
+      <line x1="15" y1="9" x2="15.01" y2="9" />
     </svg>
   );
 }

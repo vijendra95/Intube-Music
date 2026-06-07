@@ -186,52 +186,8 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Main Content: Mood Sidebar + Tracks */}
-      <div className="flex gap-6 mb-6 md:mb-8">
-        {/* Mood Column (Desktop: sidebar, Mobile: horizontal scroll) */}
-        <div className="hidden md:block w-48 flex-shrink-0">
-          <h2 className="text-lg font-bold text-white mb-3">Mood</h2>
-          <div className="space-y-1.5">
-            {moodList.map((mood) => (
-              <button
-                key={mood.name}
-                onClick={() => handleMoodSelect(mood.name)}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all ${
-                  selectedMood === mood.name
-                    ? `bg-gradient-to-r ${mood.color} text-white shadow-lg`
-                    : 'bg-[var(--color-surface-light)] text-[#ccc] hover:bg-[var(--color-surface-lighter)] hover:text-white'
-                }`}
-              >
-                <span className="text-lg">{mood.emoji}</span>
-                <span className="text-sm font-medium">{mood.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Mobile Mood: Horizontal scroll */}
-        <div className="md:hidden w-full mb-4">
-          <h2 className="text-lg font-bold text-white mb-2">Mood</h2>
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {moodList.map((mood) => (
-              <button
-                key={mood.name}
-                onClick={() => handleMoodSelect(mood.name)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-full whitespace-nowrap transition-all flex-shrink-0 ${
-                  selectedMood === mood.name
-                    ? `bg-gradient-to-r ${mood.color} text-white`
-                    : 'bg-[var(--color-surface-light)] text-[#ccc]'
-                }`}
-              >
-                <span>{mood.emoji}</span>
-                <span className="text-xs font-medium">{mood.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Tracks Section */}
-        <div className="flex-1 min-w-0">
+      {/* Tracks Section */}
+      <div className="mb-6 md:mb-8">
           {displayTracks.length > 0 && (
             <section>
               <div className="flex items-center justify-between mb-4">
@@ -370,7 +326,6 @@ export default function HomePage() {
               </div>
             </section>
           )}
-        </div>
       </div>
 
       {/* Artists */}
