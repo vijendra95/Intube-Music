@@ -130,14 +130,35 @@ export default function UploadMusicPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate required fields manually
+    if (!albumTitle.trim()) {
+      setUploadStatus('error');
+      setUploadMessage('Please enter a track/album title.');
+      return;
+    }
+    if (!artistId) {
+      setUploadStatus('error');
+      setUploadMessage('Please select an artist.');
+      return;
+    }
+    const hasAudio = tracks.some(t => t.file);
+    if (!hasAudio) {
+      setUploadStatus('error');
+      setUploadMessage('Please select at least one audio file.');
+      return;
+    }
+
     setIsUploading(true);
     setUploadProgress(0);
     setUploadStatus('uploading');
+    setUploadMessage('Starting upload...');
 
     try {
       // Step 1: Upload artwork if provided (client-side direct to Blob)
       let artworkUrl = '';
       if (artwork) {
+        setUploadMessage('Uploading artwork...');
         setUploadProgress(10);
         try {
           const artBlob = await upload(artwork.name, artwork, {
@@ -152,11 +173,13 @@ export default function UploadMusicPage() {
       setUploadProgress(30);
 
       // Step 2: Upload audio files (client-side direct to Blob - no size limit)
+      setUploadMessage('Uploading audio...');
       const audioUrls: string[] = [];
       for (let i = 0; i < tracks.length; i++) {
         const track = tracks[i];
         if (track.file) {
           try {
+            setUploadMessage(`Uploading audio ${i + 1}/${tracks.length}...`);
             const audioBlob = await upload(track.file.name, track.file, {
               access: 'public',
               handleUploadUrl: '/api/upload',
@@ -164,7 +187,10 @@ export default function UploadMusicPage() {
             audioUrls.push(audioBlob.url);
           } catch (err) {
             console.error('Audio upload failed:', err);
-            audioUrls.push('');
+            setUploadStatus('error');
+            setUploadMessage(`Audio upload failed: ${err instanceof Error ? err.message : 'Unknown error'}. Please try again.`);
+            setIsUploading(false);
+            return;
           }
         } else {
           audioUrls.push('');
@@ -174,6 +200,7 @@ export default function UploadMusicPage() {
 
       // Step 3: Create album/track records in DB
       setUploadProgress(75);
+      setUploadMessage('Saving to database...');
       if (uploadType !== 'single' && albumTitle) {
         // Create album first
         const albumRes = await fetch('/api/albums', {
@@ -189,12 +216,16 @@ export default function UploadMusicPage() {
             artwork: artworkUrl || undefined,
           }),
         });
+        if (!albumRes.ok) {
+          const errData = await albumRes.json().catch(() => ({}));
+          throw new Error(errData.error || 'Failed to create album');
+        }
         const albumData = await albumRes.json();
         setUploadProgress(85);
 
         // Create tracks for the album
         for (let i = 0; i < tracks.length; i++) {
-          await fetch('/api/tracks', {
+          const trackRes = await fetch('/api/tracks', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -203,15 +234,20 @@ export default function UploadMusicPage() {
               albumId: albumData.id,
               genre,
               mood: mood || null,
+              isPublished: true,
               isExplicit: tracks[i].isExplicit,
               trackNumber: tracks[i].trackNumber,
               audioUrl: audioUrls[i] || null,
             }),
           });
+          if (!trackRes.ok) {
+            const errData = await trackRes.json().catch(() => ({}));
+            throw new Error(errData.error || 'Failed to create track');
+          }
         }
       } else {
         // Single track
-        await fetch('/api/tracks', {
+        const trackRes = await fetch('/api/tracks', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -219,10 +255,15 @@ export default function UploadMusicPage() {
             artistId,
             genre,
             mood: mood || null,
+            isPublished: true,
             isExplicit: tracks[0]?.isExplicit || false,
             audioUrl: audioUrls[0] || null,
           }),
         });
+        if (!trackRes.ok) {
+          const errData = await trackRes.json().catch(() => ({}));
+          throw new Error(errData.error || 'Failed to save track');
+        }
       }
 
       setUploadProgress(100);
@@ -237,11 +278,16 @@ export default function UploadMusicPage() {
         setArtworkPreview(null);
         setUploadProgress(0);
         setUploadStatus('idle');
+        setUploadMessage('');
+        setMood('');
+        setGenre('');
+        setArtistId('');
+        setLabelId('');
       }, 3000);
     } catch (err) {
       console.error('Upload error:', err);
       setUploadStatus('error');
-      setUploadMessage('Upload failed. Please try again.');
+      setUploadMessage(err instanceof Error ? err.message : 'Upload failed. Please try again.');
     } finally {
       setIsUploading(false);
     }
@@ -503,16 +549,14 @@ export default function UploadMusicPage() {
                   type="text"
                   value={track.title}
                   onChange={(e) => updateTrack(index, 'title', e.target.value)}
-                  placeholder="Track title..."
+                  placeholder="Track title (optional for single)"
                   className="flex-1 px-3 py-2 bg-[#1a1a2e] border border-[#3a3a5a] rounded text-white text-sm placeholder-[#6666aa] focus:outline-none focus:border-[var(--color-primary)]"
-                  required
                 />
                 <input
                   type="file"
                   accept="audio/*"
                   onChange={(e) => updateTrack(index, 'file', e.target.files?.[0] || null)}
                   className="text-xs text-[#8888aa] file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:bg-[#3a3a5a] file:text-white cursor-pointer"
-                  required
                 />
                 <label className="flex items-center gap-1 text-xs text-[#8888aa] cursor-pointer">
                   <input
@@ -539,10 +583,10 @@ export default function UploadMusicPage() {
         </div>
 
         {/* Upload Progress */}
-        {isUploading && (
+        {(isUploading || uploadStatus === 'uploading') && (
           <div className="bg-[#2a2a4a] rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-white">Uploading...</span>
+              <span className="text-sm text-white">{uploadMessage || 'Uploading...'}</span>
               <span className="text-sm text-[var(--color-primary)]">{uploadProgress}%</span>
             </div>
             <div className="w-full h-2 bg-[#1a1a2e] rounded-full overflow-hidden">
