@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -51,6 +51,14 @@ const moodColors: Record<string, string> = {
 };
 
 export default function BrowsePage() {
+  return (
+    <Suspense fallback={<div className="p-6"><p className="text-white">Loading...</p></div>}>
+      <BrowseContent />
+    </Suspense>
+  );
+}
+
+function BrowseContent() {
   const searchParams = useSearchParams();
   const moodFilter = searchParams.get('mood');
   const genreFilter = searchParams.get('genre');
