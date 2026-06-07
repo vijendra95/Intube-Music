@@ -1,10 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+interface LabelData {
+  id: string;
+  name: string;
+  country: string | null;
+  website: string | null;
+  _count?: { artists: number; albums: number };
+}
 
 export default function LabelsPage() {
   const [showForm, setShowForm] = useState(false);
-  const [labels] = useState<Array<{ id: string; name: string; artists: number; albums: number; country: string }>>([]);
+  const [labels, setLabels] = useState<LabelData[]>([]);
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -13,12 +21,45 @@ export default function LabelsPage() {
     founded: '',
     logo: null as File | null,
   });
+  const [saving, setSaving] = useState(false);
+
+  const loadLabels = () => {
+    fetch('/api/labels').then(r => r.json()).then(data => {
+      const list = Array.isArray(data) ? data : (data.labels || []);
+      setLabels(list);
+    }).catch(() => {});
+  };
+
+  useEffect(() => { loadLabels(); }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: API call
-    alert('Label created! (API not connected yet)');
-    setShowForm(false);
+    setSaving(true);
+    try {
+      const res = await fetch('/api/labels', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          description: form.description,
+          website: form.website,
+          country: form.country,
+          founded: form.founded,
+        }),
+      });
+      if (res.ok) {
+        setShowForm(false);
+        setForm({ name: '', description: '', website: '', country: 'India', founded: '', logo: null });
+        loadLabels();
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Failed to create label');
+      }
+    } catch {
+      alert('Network error');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -142,9 +183,9 @@ export default function LabelsPage() {
               {labels.map((label) => (
                 <tr key={label.id} className="border-b border-[#2a2a4a] hover:bg-[#2a2a4a]/50">
                   <td className="px-6 py-4 text-white font-medium">{label.name}</td>
-                  <td className="px-6 py-4 text-[#8888aa]">{label.country}</td>
-                  <td className="px-6 py-4 text-[#8888aa]">{label.artists}</td>
-                  <td className="px-6 py-4 text-[#8888aa]">{label.albums}</td>
+                  <td className="px-6 py-4 text-[#8888aa]">{label.country || '-'}</td>
+                  <td className="px-6 py-4 text-[#8888aa]">{label._count?.artists || 0}</td>
+                  <td className="px-6 py-4 text-[#8888aa]">{label._count?.albums || 0}</td>
                   <td className="px-6 py-4">
                     <button className="text-sm text-[var(--color-primary)] hover:underline">Edit</button>
                   </td>
