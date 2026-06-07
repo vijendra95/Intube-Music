@@ -177,6 +177,7 @@ export default function UploadMusicPage() {
           const artBlob = await upload(artwork.name, artwork, {
             access: 'public',
             handleUploadUrl: '/api/upload',
+            clientPayload: JSON.stringify({ addRandomSuffix: true }),
           });
           artworkUrl = artBlob.url;
         } catch (err) {
@@ -196,6 +197,7 @@ export default function UploadMusicPage() {
             const audioBlob = await upload(track.file.name, track.file, {
               access: 'public',
               handleUploadUrl: '/api/upload',
+              clientPayload: JSON.stringify({ addRandomSuffix: true }),
             });
             audioUrls.push(audioBlob.url);
           } catch (err) {

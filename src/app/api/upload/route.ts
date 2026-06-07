@@ -10,6 +10,7 @@ export async function POST(request: NextRequest) {
       request,
       onBeforeGenerateToken: async () => {
         return {
+          addRandomSuffix: true,
           allowedContentTypes: [
             'audio/mpeg', 'audio/wav', 'audio/flac', 'audio/ogg', 'audio/aac', 'audio/mp4',
             'image/jpeg', 'image/png', 'image/webp',
