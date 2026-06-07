@@ -53,6 +53,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Title and artistId are required' }, { status: 400 });
     }
 
+    // Verify artist exists
+    const artist = await prisma.artist.findUnique({ where: { id: artistId } });
+    if (!artist) {
+      return NextResponse.json({ error: `Artist not found (id: ${artistId}). Please refresh and select a valid artist.` }, { status: 400 });
+    }
+
     const slug = slugify(title) + '-' + Date.now().toString(36);
 
     const track = await prisma.track.create({

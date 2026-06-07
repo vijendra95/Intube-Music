@@ -137,9 +137,9 @@ export default function UploadMusicPage() {
       setUploadMessage('Please enter a track/album title.');
       return;
     }
-    if (!artistId) {
+    if (!artistId || artistId === 'new') {
       setUploadStatus('error');
-      setUploadMessage('Please select an artist.');
+      setUploadMessage('Please select a valid artist (or create a new one first).');
       return;
     }
     const hasAudio = tracks.some(t => t.file);
@@ -148,6 +148,19 @@ export default function UploadMusicPage() {
       setUploadMessage('Please select at least one audio file.');
       return;
     }
+
+    // Refresh artist list to ensure selected artist still exists
+    try {
+      const res = await fetch('/api/artists');
+      const data = await res.json();
+      const list = Array.isArray(data) ? data : (data.artists || []);
+      setArtists(list);
+      if (!list.some((a: ArtistOption) => a.id === artistId)) {
+        setUploadStatus('error');
+        setUploadMessage('Selected artist no longer exists. Please select another artist.');
+        return;
+      }
+    } catch { /* continue with upload */ }
 
     setIsUploading(true);
     setUploadProgress(0);
