@@ -158,7 +158,7 @@ function BrowseContent() {
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-4">
             <Link href="/browse" className="text-[var(--color-primary)] hover:underline text-sm">← Back</Link>
-            <h2 className="text-xl font-bold text-white capitalize">{moodFilter} Music</h2>
+            <h2 className="text-xl font-bold text-white">{moodFilter.charAt(0).toUpperCase() + moodFilter.slice(1)} Music</h2>
           </div>
           {loadingTracks ? (
             <p className="text-[#8888aa]">Loading tracks...</p>
