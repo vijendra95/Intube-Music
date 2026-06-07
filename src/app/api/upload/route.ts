@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { put } from '@vercel/blob';
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,22 +51,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `File too large. Max: ${maxSizes[type] / 1024 / 1024}MB` }, { status: 400 });
     }
 
-    // Save to local uploads directory (in production, use S3/R2)
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', folder);
-    await mkdir(uploadDir, { recursive: true });
-
-    const ext = path.extname(file.name);
-    const filename = `${Date.now()}-${Math.random().toString(36).substring(2)}${ext}`;
-    const filepath = path.join(uploadDir, filename);
-
-    const bytes = await file.arrayBuffer();
-    await writeFile(filepath, Buffer.from(bytes));
-
-    const url = `/uploads/${folder}/${filename}`;
+    // Upload to Vercel Blob Storage
+    const filename = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
+    const blob = await put(filename, file, {
+      access: 'public',
+    });
 
     return NextResponse.json({
-      url,
-      filename,
+      url: blob.url,
+      filename: file.name,
       size: file.size,
       type: file.type,
     });

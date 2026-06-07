@@ -1,23 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+const defaultSettings = {
+  siteName: 'Intube Music',
+  tagline: 'Your Music, Your Way',
+  primaryColor: '#1ed760',
+  supportEmail: 'support@intubemusic.com',
+  maxUploadSize: '100',
+  allowRegistration: true,
+  requireEmailVerification: false,
+  freeStreamQuality: '128',
+  premiumStreamQuality: '320',
+};
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState({
-    siteName: 'Intube Music',
-    tagline: 'Your Music, Your Way',
-    primaryColor: '#1ed760',
-    supportEmail: 'support@intubemusic.com',
-    maxUploadSize: '100',
-    allowRegistration: true,
-    requireEmailVerification: false,
-    freeStreamQuality: '128',
-    premiumStreamQuality: '320',
-  });
+  const [settings, setSettings] = useState(defaultSettings);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('intube_settings');
+    if (saved) {
+      try { setSettings({ ...defaultSettings, ...JSON.parse(saved) }); } catch {}
+    }
+  }, []);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Settings saved! (API not connected yet)');
+    setSaveStatus('saving');
+    setTimeout(() => {
+      localStorage.setItem('intube_settings', JSON.stringify(settings));
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    }, 500);
   };
 
   return (
@@ -140,11 +155,17 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {saveStatus === 'saved' && (
+          <div className="px-4 py-3 bg-green-500/10 border border-green-500/30 rounded-lg text-green-400 text-sm font-medium">
+            Settings saved successfully!
+          </div>
+        )}
         <button
           type="submit"
-          className="px-6 py-3 bg-[var(--color-primary)] text-black font-semibold rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors"
+          disabled={saveStatus === 'saving'}
+          className="px-6 py-3 bg-[var(--color-primary)] text-black font-semibold rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors disabled:opacity-50"
         >
-          Save Settings
+          {saveStatus === 'saving' ? 'Saving...' : 'Save Settings'}
         </button>
       </form>
     </div>
