@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       include: { artist: true, album: true },
     });
 
-    return NextResponse.json(track, { status: 201 });
+    return NextResponse.json({ ...track, playCount: Number(track.playCount), artist: track.artist ? { ...track.artist, totalStreams: Number(track.artist.totalStreams) } : null }, { status: 201 });
   } catch (error) {
     console.error('POST /api/tracks error:', error);
     return NextResponse.json({ error: 'Failed to create track' }, { status: 500 });

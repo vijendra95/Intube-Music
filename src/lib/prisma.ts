@@ -1,5 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 
+// Fix BigInt JSON serialization for PostgreSQL
+(BigInt.prototype as unknown as { toJSON: () => number }).toJSON = function () {
+  return Number(this);
+};
+
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };

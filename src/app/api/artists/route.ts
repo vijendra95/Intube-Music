@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(artist, { status: 201 });
+    return NextResponse.json({ ...artist, totalStreams: Number(artist.totalStreams) }, { status: 201 });
   } catch (error) {
     console.error('POST /api/artists error:', error);
     return NextResponse.json({ error: 'Failed to create artist' }, { status: 500 });
