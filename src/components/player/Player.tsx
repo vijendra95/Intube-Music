@@ -1,12 +1,14 @@
 'use client';
 
-import { useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { usePlayerStore } from '@/store/playerStore';
 import { formatDuration } from '@/lib/utils';
 
 export default function Player() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
+  const expandedProgressRef = useRef<HTMLDivElement>(null);
+  const [expanded, setExpanded] = useState(false);
 
   const {
     currentTrack,
@@ -17,6 +19,8 @@ export default function Player() {
     duration,
     repeat,
     shuffle,
+    queue,
+    queueIndex,
     setIsPlaying,
     setProgress,
     setDuration,
@@ -27,25 +31,10 @@ export default function Player() {
     toggleMute,
     toggleRepeat,
     toggleShuffle,
+    setQueue,
   } = usePlayerStore();
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (isPlaying) {
-      audio.play().catch(() => setIsPlaying(false));
-    } else {
-      audio.pause();
-    }
-  }, [isPlaying, currentTrack, setIsPlaying]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.volume = isMuted ? 0 : volume;
-  }, [volume, isMuted]);
-
+  // Handle track source changes — only this effect sets audio.src and calls play for new tracks
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !currentTrack) return;
@@ -58,7 +47,26 @@ export default function Player() {
         audio.play().catch(() => setIsPlaying(false));
       }
     }
-  }, [currentTrack, isPlaying, setIsPlaying]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentTrack]);
+
+  // Handle play/pause toggle — only for same track play/pause
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !audio.src) return;
+
+    if (isPlaying) {
+      audio.play().catch(() => setIsPlaying(false));
+    } else {
+      audio.pause();
+    }
+  }, [isPlaying, setIsPlaying]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.volume = isMuted ? 0 : volume;
+  }, [volume, isMuted]);
 
   const handleTimeUpdate = useCallback(() => {
     const audio = audioRef.current;
@@ -86,7 +94,7 @@ export default function Player() {
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const audio = audioRef.current;
-    const bar = progressRef.current;
+    const bar = e.currentTarget;
     if (!audio || !bar) return;
 
     const rect = bar.getBoundingClientRect();
@@ -113,6 +121,115 @@ export default function Player() {
   }
 
   const progressPercent = duration > 0 ? (progress / duration) * 100 : 0;
+  const upNext = queue.slice(queueIndex + 1, queueIndex + 11);
+
+  // Expanded full-screen player
+  if (expanded) {
+    return (
+      <>
+        <audio
+          ref={audioRef}
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          onEnded={handleEnded}
+        />
+        <div className="fixed inset-0 z-50 bg-gradient-to-b from-[#1a1a2e] via-[#0d0d1a] to-[#000] flex flex-col overflow-y-auto">
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-4">
+            <button onClick={() => setExpanded(false)} className="text-white/70 hover:text-white">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
+            </button>
+            <p className="text-sm text-white/60 font-medium">Now Playing</p>
+            <div className="w-6" />
+          </div>
+
+          {/* Cover Art */}
+          <div className="flex-shrink-0 flex justify-center px-8 py-4">
+            <div className={`w-72 h-72 md:w-80 md:h-80 rounded-2xl overflow-hidden shadow-2xl shadow-black/60 ${isPlaying ? 'animate-spin-slow' : ''}`} style={{borderRadius: isPlaying ? '50%' : '1rem'}}>
+              {(currentTrack.coverUrl || currentTrack.album?.artwork) ? (
+                <img src={(currentTrack.coverUrl || currentTrack.album?.artwork)!} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1ed760]/20 to-[#1ed760]/5">
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#1ed760" strokeWidth="1"><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></svg>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Track Info */}
+          <div className="px-8 mt-4 text-center">
+            <h2 className="text-2xl font-bold text-white truncate">{currentTrack.title}</h2>
+            <p className="text-base text-[#b3b3b3] mt-1">{currentTrack.artist?.name}</p>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="px-8 mt-6">
+            <div
+              onClick={handleProgressClick}
+              className="w-full h-[6px] bg-[#3e3e3e] rounded-full cursor-pointer group relative"
+            >
+              <div className="h-full bg-white rounded-full relative" style={{ width: `${progressPercent}%` }}>
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-md" />
+              </div>
+            </div>
+            <div className="flex justify-between mt-2">
+              <span className="text-xs text-[#b3b3b3]">{formatDuration(Math.floor(progress))}</span>
+              <span className="text-xs text-[#b3b3b3]">{formatDuration(Math.floor(duration))}</span>
+            </div>
+          </div>
+
+          {/* Controls */}
+          <div className="flex items-center justify-center gap-8 mt-4 px-8">
+            <button onClick={toggleShuffle} className={`${shuffle ? 'text-[#1ed760]' : 'text-white/60'} hover:text-white`}>
+              <ShuffleIcon />
+            </button>
+            <button onClick={prevTrack} className="text-white/80 hover:text-white">
+              <PrevIcon />
+            </button>
+            <button onClick={togglePlay} className="w-16 h-16 bg-white rounded-full flex items-center justify-center hover:scale-105 transition-transform">
+              {isPlaying ? <PauseIcon /> : <PlayIcon />}
+            </button>
+            <button onClick={nextTrack} className="text-white/80 hover:text-white">
+              <NextIcon />
+            </button>
+            <button onClick={toggleRepeat} className={`${repeat !== 'off' ? 'text-[#1ed760]' : 'text-white/60'} hover:text-white relative`}>
+              <RepeatIcon />
+              {repeat === 'one' && <span className="absolute -top-1 -right-1 text-[8px] font-bold text-[#1ed760]">1</span>}
+            </button>
+          </div>
+
+          {/* Up Next / Suggested */}
+          {upNext.length > 0 && (
+            <div className="px-6 mt-8 pb-8">
+              <h3 className="text-lg font-semibold text-white mb-3">Up Next</h3>
+              <div className="space-y-1">
+                {upNext.map((track, i) => (
+                  <div
+                    key={track.id + '-' + i}
+                    onClick={() => setQueue(queue, queueIndex + 1 + i)}
+                    className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
+                  >
+                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-[#282828] flex-shrink-0">
+                      {(track.coverUrl || track.album?.artwork) ? (
+                        <img src={(track.coverUrl || track.album?.artwork)!} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center"><MusicNoteIcon /></div>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-white truncate">{track.title}</p>
+                      <p className="text-xs text-[#b3b3b3] truncate">{track.artist?.name}</p>
+                    </div>
+                    <span className="text-xs text-[#666]">{formatDuration(track.duration || 0)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="h-[90px] bg-gradient-to-r from-[#0a0a0a] via-[#111111] to-[#0a0a0a] border-t border-white/5 flex items-center px-5 gap-5 backdrop-blur-xl relative overflow-hidden">
@@ -128,8 +245,8 @@ export default function Player() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#1ed760] via-transparent to-[#1ed760]/30 blur-3xl" />
       </div>
 
-      {/* Track Info with Rotating Poster */}
-      <div className="flex items-center gap-4 w-72 min-w-0 relative z-10">
+      {/* Track Info with Rotating Poster — click to expand */}
+      <div onClick={() => setExpanded(true)} className="flex items-center gap-4 w-72 min-w-0 relative z-10 cursor-pointer">
         <div className={`w-14 h-14 rounded-full bg-gradient-to-br from-[#282828] to-[#1a1a1a] flex-shrink-0 overflow-hidden shadow-lg shadow-black/50 ring-2 ring-white/10 ${isPlaying ? 'animate-spin-slow' : ''}`}>
           {(currentTrack.coverUrl || currentTrack.album?.artwork) ? (
             <img src={(currentTrack.coverUrl || currentTrack.album?.artwork)!} alt="" className="w-full h-full object-cover" />
@@ -145,7 +262,7 @@ export default function Player() {
             {currentTrack.artist?.name}
           </p>
         </div>
-        <button className="text-[#b3b3b3] hover:text-[#1ed760] ml-2 flex-shrink-0 transition-all duration-200 hover:scale-110">
+        <button onClick={(e) => { e.stopPropagation(); }} className="text-[#b3b3b3] hover:text-[#1ed760] ml-2 flex-shrink-0 transition-all duration-200 hover:scale-110">
           <HeartIcon />
         </button>
       </div>
