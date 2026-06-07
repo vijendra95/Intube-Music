@@ -2,23 +2,45 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { usePlayerStore } from '@/store/playerStore';
+import { Track } from '@/types';
 
-interface Artist {
+interface ArtistData {
   id: string;
   name: string;
   avatar?: string | null;
   totalStreams: number;
 }
 
-interface Track {
+interface TrackData {
   id: string;
   title: string;
-  artist?: { name: string } | null;
-  album?: { artwork?: string | null } | null;
-  genre?: string | null;
+  slug: string;
+  duration: number;
+  trackNumber: number;
+  isExplicit: boolean;
+  isPublished: boolean;
+  releaseDate: string | null;
+  audioUrl128: string | null;
+  audioUrl320: string | null;
+  audioUrlFlac: string | null;
+  audioOriginal: string | null;
+  videoUrl: string | null;
+  canvasUrl: string | null;
+  genre: string | null;
+  mood: string | null;
+  isrc: string | null;
+  lyrics: string | null;
+  playCount: number;
+  likeCount: number;
+  artistId: string;
+  albumId: string | null;
+  createdAt: string;
+  artist?: { id: string; name: string; slug: string; bio: string | null; avatar: string | null; coverImage: string | null; verified: boolean; monthlyListeners: number; totalStreams: number; country: string | null; genres: string[]; socialLinks: Record<string, string> | null; label: null; labelId: string | null; } | null;
+  album?: { id: string; title: string; slug: string; artwork: string | null; releaseDate: string | null; type: string; genre: string | null; description: string | null; totalTracks: number; duration: number; isExplicit: boolean; isPublished: boolean; artistId: string; labelId: string | null; } | null;
 }
 
-interface Banner {
+interface BannerData {
   id: string;
   title: string;
   subtitle?: string | null;
@@ -38,22 +60,60 @@ const moodPlaylists = [
 ];
 
 export default function HomePage() {
-  const [artists, setArtists] = useState<Artist[]>([]);
-  const [tracks, setTracks] = useState<Track[]>([]);
-  const [banners, setBanners] = useState<Banner[]>([]);
+  const [artists, setArtists] = useState<ArtistData[]>([]);
+  const [tracks, setTracks] = useState<TrackData[]>([]);
+  const [banners, setBanners] = useState<BannerData[]>([]);
+  const { setQueue, currentTrack, isPlaying } = usePlayerStore();
   const greeting = getGreeting();
 
   useEffect(() => {
     fetch('/api/artists?limit=6').then(r => r.json()).then(data => {
       setArtists(Array.isArray(data) ? data : (data.artists || []));
     }).catch(() => {});
-    fetch('/api/tracks?limit=10&published=true').then(r => r.json()).then(data => {
+    fetch('/api/tracks?limit=20&published=true').then(r => r.json()).then(data => {
       setTracks(Array.isArray(data) ? data : (data.tracks || []));
     }).catch(() => {});
     fetch('/api/banners?active=true').then(r => r.json()).then(data => {
       setBanners(Array.isArray(data) ? data : (data.banners || []));
     }).catch(() => {});
   }, []);
+
+  const handlePlayTrack = (index: number) => {
+    const playableTracks = tracks.filter(t => t.audioUrl320 || t.audioUrl128 || t.audioOriginal);
+    const mappedTracks: Track[] = playableTracks.map(t => ({
+      id: t.id,
+      title: t.title,
+      slug: t.slug,
+      duration: t.duration,
+      trackNumber: t.trackNumber,
+      isExplicit: t.isExplicit,
+      isPublished: t.isPublished,
+      releaseDate: t.releaseDate,
+      audioUrl128: t.audioOriginal || t.audioUrl128,
+      audioUrl320: t.audioOriginal || t.audioUrl320,
+      audioUrlFlac: t.audioUrlFlac,
+      videoUrl: t.videoUrl,
+      canvasUrl: t.canvasUrl,
+      genre: t.genre,
+      mood: t.mood,
+      isrc: t.isrc,
+      lyrics: t.lyrics,
+      playCount: t.playCount,
+      likeCount: t.likeCount,
+      artist: t.artist as Track['artist'],
+      artistId: t.artistId,
+      album: t.album as Track['album'],
+      albumId: t.albumId,
+      createdAt: t.createdAt,
+    }));
+
+    // Find the real index in playable tracks
+    const clickedTrack = tracks[index];
+    const playableIndex = playableTracks.findIndex(t => t.id === clickedTrack.id);
+    if (playableIndex >= 0) {
+      setQueue(mappedTracks, playableIndex);
+    }
+  };
 
   return (
     <div className="p-4 md:p-6 pb-32 md:pb-8">
@@ -81,7 +141,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Banners from Admin */}
+      {/* Banners */}
       {banners.length > 0 && (
         <section className="mb-6 md:mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -117,7 +177,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* New Releases / Tracks from Database */}
+      {/* Tracks - Playable List */}
       {tracks.length > 0 && (
         <section className="mb-6 md:mb-8">
           <div className="flex items-center justify-between mb-3 md:mb-4">
@@ -126,38 +186,75 @@ export default function HomePage() {
               Show all
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
-            {tracks.slice(0, 10).map((track) => (
-              <div
-                key={track.id}
-                className="group p-3 md:p-4 rounded-lg bg-[var(--color-surface-light)] hover:bg-[var(--color-surface-lighter)] transition-all duration-300 active:scale-95"
-              >
-                <div className="aspect-square rounded-md mb-2 md:mb-3 bg-[var(--color-surface-lighter)] flex items-center justify-center relative overflow-hidden">
-                  {track.album?.artwork ? (
-                    <img src={track.album.artwork} alt={track.title} className="w-full h-full object-cover" />
-                  ) : (
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-[var(--color-text-muted)] md:w-12 md:h-12">
-                      <circle cx="12" cy="12" r="10" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  )}
-                  <div className="absolute bottom-2 right-2 w-9 h-9 md:w-10 md:h-10 bg-[var(--color-primary)] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all shadow-lg">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="black">
-                      <polygon points="5 3 19 12 5 21 5 3" />
-                    </svg>
+          <div className="space-y-1">
+            {tracks.slice(0, 15).map((track, index) => {
+              const isCurrentTrack = currentTrack?.id === track.id;
+              const hasAudio = !!(track.audioUrl320 || track.audioUrl128 || track.audioOriginal);
+              return (
+                <div
+                  key={track.id}
+                  onClick={() => hasAudio && handlePlayTrack(index)}
+                  className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 group ${
+                    isCurrentTrack ? 'bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30' : 'hover:bg-[var(--color-surface-light)]'
+                  } ${!hasAudio ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {/* Track number / play icon */}
+                  <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                    {isCurrentTrack && isPlaying ? (
+                      <div className="flex items-end gap-0.5 h-4">
+                        <span className="w-1 bg-[var(--color-primary)] rounded-full animate-pulse" style={{height: '60%'}}></span>
+                        <span className="w-1 bg-[var(--color-primary)] rounded-full animate-pulse" style={{height: '100%', animationDelay: '0.2s'}}></span>
+                        <span className="w-1 bg-[var(--color-primary)] rounded-full animate-pulse" style={{height: '40%', animationDelay: '0.4s'}}></span>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-[#8888aa] group-hover:hidden">{index + 1}</span>
+                    )}
+                    {!(isCurrentTrack && isPlaying) && (
+                      <svg className="w-4 h-4 text-white hidden group-hover:block" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                      </svg>
+                    )}
                   </div>
+
+                  {/* Album art */}
+                  <div className="w-10 h-10 rounded bg-[var(--color-surface-lighter)] flex-shrink-0 overflow-hidden">
+                    {track.album?.artwork ? (
+                      <img src={track.album.artwork} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#666]">
+                          <circle cx="12" cy="12" r="10" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Title & Artist */}
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-medium truncate ${isCurrentTrack ? 'text-[var(--color-primary)]' : 'text-white'}`}>{track.title}</p>
+                    <p className="text-xs text-[#8888aa] truncate">{track.artist?.name || 'Unknown Artist'}</p>
+                  </div>
+
+                  {/* Genre/Mood badge */}
+                  {(track.mood || track.genre) && (
+                    <span className="hidden md:inline-block px-2 py-0.5 text-[10px] rounded-full bg-[var(--color-surface-lighter)] text-[#aaa] capitalize">
+                      {track.mood || track.genre}
+                    </span>
+                  )}
+
+                  {/* Duration placeholder */}
+                  <span className="text-xs text-[#8888aa] w-10 text-right">
+                    {track.duration > 0 ? formatTime(track.duration) : '--:--'}
+                  </span>
                 </div>
-                <p className="text-sm md:text-base font-semibold text-white truncate">{track.title}</p>
-                <p className="text-xs md:text-sm text-[var(--color-text-muted)] truncate mt-0.5 md:mt-1">
-                  {track.genre || 'Song'} &bull; {track.artist?.name || 'Unknown'}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}
 
-      {/* Artists from Database */}
+      {/* Artists */}
       {artists.length > 0 && (
         <section className="mb-6 md:mb-8">
           <div className="flex items-center justify-between mb-3 md:mb-4">
@@ -190,7 +287,7 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Charts Section */}
+      {/* Charts */}
       <section className="mb-6 md:mb-8">
         <div className="flex items-center justify-between mb-3 md:mb-4">
           <h2 className="text-xl md:text-2xl font-bold text-white">Charts</h2>
@@ -230,4 +327,10 @@ function getGreeting(): string {
   if (hour < 12) return 'Good Morning';
   if (hour < 18) return 'Good Afternoon';
   return 'Good Evening';
+}
+
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
 }

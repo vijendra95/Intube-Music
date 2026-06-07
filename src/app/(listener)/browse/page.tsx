@@ -3,6 +3,8 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { usePlayerStore } from '@/store/playerStore';
+import { Track } from '@/types';
 
 interface Genre {
   id: string;
@@ -14,6 +16,34 @@ interface Mood {
   id: string;
   name: string;
   slug: string;
+}
+
+interface TrackData {
+  id: string;
+  title: string;
+  slug: string;
+  duration: number;
+  trackNumber: number;
+  isExplicit: boolean;
+  isPublished: boolean;
+  releaseDate: string | null;
+  audioUrl128: string | null;
+  audioUrl320: string | null;
+  audioUrlFlac: string | null;
+  audioOriginal: string | null;
+  videoUrl: string | null;
+  canvasUrl: string | null;
+  genre: string | null;
+  mood: string | null;
+  isrc: string | null;
+  lyrics: string | null;
+  playCount: number;
+  likeCount: number;
+  artistId: string;
+  albumId: string | null;
+  createdAt: string;
+  artist?: { id: string; name: string; slug: string; bio: string | null; avatar: string | null; coverImage: string | null; verified: boolean; monthlyListeners: number; totalStreams: number; country: string | null; genres: string[]; socialLinks: Record<string, string> | null; label: null; labelId: string | null; } | null;
+  album?: { id: string; title: string; slug: string; artwork: string | null; releaseDate: string | null; type: string; genre: string | null; description: string | null; totalTracks: number; duration: number; isExplicit: boolean; isPublished: boolean; artistId: string; labelId: string | null; } | null;
 }
 
 const genreColors: Record<string, string> = {
@@ -64,29 +94,143 @@ function BrowseContent() {
   const genreFilter = searchParams.get('genre');
   const [genres, setGenres] = useState<Genre[]>([]);
   const [moods, setMoods] = useState<Mood[]>([]);
+  const [filteredTracks, setFilteredTracks] = useState<TrackData[]>([]);
+  const [loadingTracks, setLoadingTracks] = useState(false);
+  const { setQueue, currentTrack, isPlaying } = usePlayerStore();
 
   useEffect(() => {
     fetch('/api/genres').then(r => r.json()).then(data => setGenres(data.genres || [])).catch(() => {});
     fetch('/api/moods').then(r => r.json()).then(data => setMoods(data.moods || [])).catch(() => {});
   }, []);
 
+  useEffect(() => {
+    if (moodFilter || genreFilter) {
+      setLoadingTracks(true);
+      const params = new URLSearchParams({ limit: '50', published: 'true' });
+      if (moodFilter) params.set('mood', moodFilter);
+      if (genreFilter) params.set('genre', genreFilter);
+      fetch(`/api/tracks?${params.toString()}`).then(r => r.json()).then(data => {
+        setFilteredTracks(data.tracks || []);
+      }).catch(() => {}).finally(() => setLoadingTracks(false));
+    }
+  }, [moodFilter, genreFilter]);
+
+  const handlePlayTrack = (index: number) => {
+    const playable = filteredTracks.filter(t => t.audioUrl320 || t.audioUrl128 || t.audioOriginal);
+    const mapped: Track[] = playable.map(t => ({
+      id: t.id,
+      title: t.title,
+      slug: t.slug,
+      duration: t.duration,
+      trackNumber: t.trackNumber,
+      isExplicit: t.isExplicit,
+      isPublished: t.isPublished,
+      releaseDate: t.releaseDate,
+      audioUrl128: t.audioOriginal || t.audioUrl128,
+      audioUrl320: t.audioOriginal || t.audioUrl320,
+      audioUrlFlac: t.audioUrlFlac,
+      videoUrl: t.videoUrl,
+      canvasUrl: t.canvasUrl,
+      genre: t.genre,
+      mood: t.mood,
+      isrc: t.isrc,
+      lyrics: t.lyrics,
+      playCount: t.playCount,
+      likeCount: t.likeCount,
+      artist: t.artist as Track['artist'],
+      artistId: t.artistId,
+      album: t.album as Track['album'],
+      albumId: t.albumId,
+      createdAt: t.createdAt,
+    }));
+    const clicked = filteredTracks[index];
+    const realIdx = playable.findIndex(t => t.id === clicked.id);
+    if (realIdx >= 0) setQueue(mapped, realIdx);
+  };
+
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold text-white mb-8">Browse</h1>
 
       {moodFilter && (
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-white mb-4 capitalize">{moodFilter} Music</h2>
-          <p className="text-[var(--color-text-muted)] text-base">Showing tracks matching your mood: {moodFilter}</p>
-          <Link href="/browse" className="text-[var(--color-primary)] hover:underline text-sm mt-2 inline-block">← Back to Browse</Link>
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <Link href="/browse" className="text-[var(--color-primary)] hover:underline text-sm">← Back</Link>
+            <h2 className="text-xl font-bold text-white capitalize">{moodFilter} Music</h2>
+          </div>
+          {loadingTracks ? (
+            <p className="text-[#8888aa]">Loading tracks...</p>
+          ) : filteredTracks.length === 0 ? (
+            <p className="text-[#8888aa]">No tracks found for this mood. Upload songs with &quot;{moodFilter}&quot; mood from admin.</p>
+          ) : (
+            <div className="space-y-1">
+              {filteredTracks.map((track, idx) => {
+                const isCurrent = currentTrack?.id === track.id;
+                const hasAudio = !!(track.audioUrl320 || track.audioUrl128 || track.audioOriginal);
+                return (
+                  <div
+                    key={track.id}
+                    onClick={() => hasAudio && handlePlayTrack(idx)}
+                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all group ${isCurrent ? 'bg-[var(--color-primary)]/10' : 'hover:bg-[var(--color-surface-light)]'} ${!hasAudio ? 'opacity-50' : ''}`}
+                  >
+                    <div className="w-8 text-center">
+                      {isCurrent && isPlaying ? (
+                        <span className="text-[var(--color-primary)] text-xs">▶</span>
+                      ) : (
+                        <span className="text-sm text-[#8888aa]">{idx + 1}</span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-medium truncate ${isCurrent ? 'text-[var(--color-primary)]' : 'text-white'}`}>{track.title}</p>
+                      <p className="text-xs text-[#8888aa] truncate">{track.artist?.name || 'Unknown'}</p>
+                    </div>
+                    <span className="text-xs text-[#8888aa]">{track.genre || ''}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
       {genreFilter && (
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-white mb-4 capitalize">{genreFilter} Music</h2>
-          <p className="text-[var(--color-text-muted)] text-base">Showing tracks in genre: {genreFilter}</p>
-          <Link href="/browse" className="text-[var(--color-primary)] hover:underline text-sm mt-2 inline-block">← Back to Browse</Link>
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <Link href="/browse" className="text-[var(--color-primary)] hover:underline text-sm">← Back</Link>
+            <h2 className="text-xl font-bold text-white capitalize">{genreFilter} Music</h2>
+          </div>
+          {loadingTracks ? (
+            <p className="text-[#8888aa]">Loading tracks...</p>
+          ) : filteredTracks.length === 0 ? (
+            <p className="text-[#8888aa]">No tracks found for this genre.</p>
+          ) : (
+            <div className="space-y-1">
+              {filteredTracks.map((track, idx) => {
+                const isCurrent = currentTrack?.id === track.id;
+                const hasAudio = !!(track.audioUrl320 || track.audioUrl128 || track.audioOriginal);
+                return (
+                  <div
+                    key={track.id}
+                    onClick={() => hasAudio && handlePlayTrack(idx)}
+                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all group ${isCurrent ? 'bg-[var(--color-primary)]/10' : 'hover:bg-[var(--color-surface-light)]'} ${!hasAudio ? 'opacity-50' : ''}`}
+                  >
+                    <div className="w-8 text-center">
+                      {isCurrent && isPlaying ? (
+                        <span className="text-[var(--color-primary)] text-xs">▶</span>
+                      ) : (
+                        <span className="text-sm text-[#8888aa]">{idx + 1}</span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-medium truncate ${isCurrent ? 'text-[var(--color-primary)]' : 'text-white'}`}>{track.title}</p>
+                      <p className="text-xs text-[#8888aa] truncate">{track.artist?.name || 'Unknown'}</p>
+                    </div>
+                    <span className="text-xs text-[#8888aa] capitalize">{track.mood || ''}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 

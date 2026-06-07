@@ -29,11 +29,16 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    // Delete related tracks first (cascade)
+    await prisma.track.deleteMany({ where: { artistId: id } });
+    // Delete related albums
+    await prisma.album.deleteMany({ where: { artistId: id } });
+    // Then delete the artist
     await prisma.artist.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('DELETE /api/artists/[id] error:', error);
-    return NextResponse.json({ error: 'Failed to delete artist' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to delete artist. It may have linked content.' }, { status: 500 });
   }
 }
 

@@ -128,9 +128,9 @@ export default function Player() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#1ed760] via-transparent to-[#1ed760]/30 blur-3xl" />
       </div>
 
-      {/* Track Info */}
+      {/* Track Info with Rotating Poster */}
       <div className="flex items-center gap-4 w-72 min-w-0 relative z-10">
-        <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-[#282828] to-[#1a1a1a] flex-shrink-0 overflow-hidden shadow-lg shadow-black/50 ring-1 ring-white/5">
+        <div className={`w-14 h-14 rounded-full bg-gradient-to-br from-[#282828] to-[#1a1a1a] flex-shrink-0 overflow-hidden shadow-lg shadow-black/50 ring-2 ring-white/10 ${isPlaying ? 'animate-spin-slow' : ''}`}>
           {currentTrack.album?.artwork ? (
             <img src={currentTrack.album.artwork} alt="" className="w-full h-full object-cover" />
           ) : (

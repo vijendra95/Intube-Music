@@ -19,6 +19,7 @@ export default function UploadMusicPage() {
   const [artistId, setArtistId] = useState('');
   const [labelId, setLabelId] = useState('');
   const [genre, setGenre] = useState('');
+  const [mood, setMood] = useState('');
   const [releaseDate, setReleaseDate] = useState('');
   const [artwork, setArtwork] = useState<File | null>(null);
   const [artworkPreview, setArtworkPreview] = useState<string | null>(null);
@@ -201,6 +202,7 @@ export default function UploadMusicPage() {
               artistId,
               albumId: albumData.id,
               genre,
+              mood: mood || null,
               isExplicit: tracks[i].isExplicit,
               trackNumber: tracks[i].trackNumber,
               audioUrl: audioUrls[i] || null,
@@ -216,6 +218,7 @@ export default function UploadMusicPage() {
             title: tracks[0]?.title || albumTitle,
             artistId,
             genre,
+            mood: mood || null,
             isExplicit: tracks[0]?.isExplicit || false,
             audioUrl: audioUrls[0] || null,
           }),
@@ -407,6 +410,27 @@ export default function UploadMusicPage() {
               <option value="bhojpuri">Bhojpuri</option>
               <option value="ghazal">Ghazal</option>
               <option value="lofi">Lo-Fi</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Mood</label>
+            <select
+              value={mood}
+              onChange={(e) => setMood(e.target.value)}
+              className="w-full px-4 py-2.5 bg-[#2a2a4a] border border-[#3a3a5a] rounded-lg text-white focus:outline-none focus:border-[var(--color-primary)] transition-colors"
+            >
+              <option value="">Select Mood...</option>
+              <option value="happy">Happy</option>
+              <option value="romantic">Romantic</option>
+              <option value="sad">Sad</option>
+              <option value="party">Party</option>
+              <option value="chill">Chill</option>
+              <option value="focus">Focus</option>
+              <option value="workout">Workout</option>
+              <option value="sleep">Sleep</option>
+              <option value="devotional">Devotional</option>
+              <option value="motivational">Motivational</option>
             </select>
           </div>
 
