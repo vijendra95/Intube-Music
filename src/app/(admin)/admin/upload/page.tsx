@@ -26,17 +26,71 @@ export default function UploadMusicPage() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [artists, setArtists] = useState<ArtistOption[]>([]);
   const [labels, setLabels] = useState<LabelOption[]>([]);
+  const [showNewArtist, setShowNewArtist] = useState(false);
+  const [newArtistName, setNewArtistName] = useState('');
+  const [creatingArtist, setCreatingArtist] = useState(false);
+  const [showNewLabel, setShowNewLabel] = useState(false);
+  const [newLabelName, setNewLabelName] = useState('');
+  const [creatingLabel, setCreatingLabel] = useState(false);
 
-  useEffect(() => {
+  const loadArtists = () => {
     fetch('/api/artists').then(r => r.json()).then(data => {
       const list = Array.isArray(data) ? data : (data.artists || []);
       setArtists(list);
     }).catch(() => {});
+  };
+  const loadLabels = () => {
     fetch('/api/labels').then(r => r.json()).then(data => {
       const list = Array.isArray(data) ? data : (data.labels || []);
       setLabels(list);
     }).catch(() => {});
-  }, []);
+  };
+
+  useEffect(() => { loadArtists(); loadLabels(); }, []);
+
+  const handleCreateArtist = async () => {
+    if (!newArtistName.trim()) return;
+    setCreatingArtist(true);
+    try {
+      const res = await fetch('/api/artists', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newArtistName.trim(), country: 'India' }),
+      });
+      if (res.ok) {
+        const created = await res.json();
+        loadArtists();
+        setArtistId(created.id);
+        setShowNewArtist(false);
+        setNewArtistName('');
+      } else {
+        alert('Failed to create artist');
+      }
+    } catch { alert('Network error'); }
+    finally { setCreatingArtist(false); }
+  };
+
+  const handleCreateLabel = async () => {
+    if (!newLabelName.trim()) return;
+    setCreatingLabel(true);
+    try {
+      const res = await fetch('/api/labels', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newLabelName.trim(), country: 'India' }),
+      });
+      if (res.ok) {
+        const created = await res.json();
+        loadLabels();
+        setLabelId(created.id);
+        setShowNewLabel(false);
+        setNewLabelName('');
+      } else {
+        alert('Failed to create label');
+      }
+    } catch { alert('Network error'); }
+    finally { setCreatingLabel(false); }
+  };
 
   const handleArtworkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -235,27 +289,95 @@ export default function UploadMusicPage() {
             <label className="block text-sm font-medium text-white mb-2">Artist</label>
             <select
               value={artistId}
-              onChange={(e) => setArtistId(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value === 'new') {
+                  setShowNewArtist(true);
+                  setArtistId('');
+                } else {
+                  setArtistId(e.target.value);
+                  setShowNewArtist(false);
+                }
+              }}
               className="w-full px-4 py-2.5 bg-[#2a2a4a] border border-[#3a3a5a] rounded-lg text-white focus:outline-none focus:border-[var(--color-primary)] transition-colors"
-              required
+              required={!showNewArtist}
             >
               <option value="">Select Artist...</option>
               {artists.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
               <option value="new">+ Add New Artist</option>
             </select>
+            {showNewArtist && (
+              <div className="mt-2 flex gap-2">
+                <input
+                  type="text"
+                  value={newArtistName}
+                  onChange={(e) => setNewArtistName(e.target.value)}
+                  placeholder="Artist name..."
+                  className="flex-1 px-3 py-2 bg-[#2a2a4a] border border-[#3a3a5a] rounded-lg text-white text-sm focus:outline-none focus:border-[var(--color-primary)]"
+                />
+                <button
+                  type="button"
+                  onClick={handleCreateArtist}
+                  disabled={creatingArtist}
+                  className="px-4 py-2 bg-[var(--color-primary)] text-black text-sm font-medium rounded-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50"
+                >
+                  {creatingArtist ? 'Creating...' : 'Create'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowNewArtist(false)}
+                  className="px-3 py-2 bg-[#3a3a5a] text-white text-sm rounded-lg hover:bg-[#4a4a6a]"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-white mb-2">Label / Company</label>
             <select
               value={labelId}
-              onChange={(e) => setLabelId(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value === 'new') {
+                  setShowNewLabel(true);
+                  setLabelId('');
+                } else {
+                  setLabelId(e.target.value);
+                  setShowNewLabel(false);
+                }
+              }}
               className="w-full px-4 py-2.5 bg-[#2a2a4a] border border-[#3a3a5a] rounded-lg text-white focus:outline-none focus:border-[var(--color-primary)] transition-colors"
             >
               <option value="">Select Label (Optional)...</option>
               {labels.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
               <option value="new">+ Add New Label</option>
             </select>
+            {showNewLabel && (
+              <div className="mt-2 flex gap-2">
+                <input
+                  type="text"
+                  value={newLabelName}
+                  onChange={(e) => setNewLabelName(e.target.value)}
+                  placeholder="Label name..."
+                  className="flex-1 px-3 py-2 bg-[#2a2a4a] border border-[#3a3a5a] rounded-lg text-white text-sm focus:outline-none focus:border-[var(--color-primary)]"
+                />
+                <button
+                  type="button"
+                  onClick={handleCreateLabel}
+                  disabled={creatingLabel}
+                  className="px-4 py-2 bg-[var(--color-primary)] text-black text-sm font-medium rounded-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50"
+                >
+                  {creatingLabel ? 'Creating...' : 'Create'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowNewLabel(false)}
+                  className="px-3 py-2 bg-[#3a3a5a] text-white text-sm rounded-lg hover:bg-[#4a4a6a]"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
 
           <div>
