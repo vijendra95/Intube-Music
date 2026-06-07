@@ -12,6 +12,7 @@ export interface Track {
   audioUrlFlac: string | null;
   videoUrl: string | null;
   canvasUrl: string | null;
+  coverUrl: string | null;
   genre: string | null;
   mood: string | null;
   isrc: string | null;

@@ -33,6 +33,7 @@ interface TrackData {
   audioOriginal: string | null;
   videoUrl: string | null;
   canvasUrl: string | null;
+  coverUrl: string | null;
   genre: string | null;
   mood: string | null;
   isrc: string | null;
@@ -131,6 +132,7 @@ function BrowseContent() {
       audioUrlFlac: t.audioUrlFlac,
       videoUrl: t.videoUrl,
       canvasUrl: t.canvasUrl,
+      coverUrl: t.coverUrl || null,
       genre: t.genre,
       mood: t.mood,
       isrc: t.isrc,

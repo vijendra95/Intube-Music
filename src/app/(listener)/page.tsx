@@ -27,6 +27,7 @@ interface TrackData {
   audioOriginal: string | null;
   videoUrl: string | null;
   canvasUrl: string | null;
+  coverUrl: string | null;
   genre: string | null;
   mood: string | null;
   isrc: string | null;
@@ -94,6 +95,7 @@ export default function HomePage() {
       audioUrlFlac: t.audioUrlFlac,
       videoUrl: t.videoUrl,
       canvasUrl: t.canvasUrl,
+      coverUrl: t.coverUrl || null,
       genre: t.genre,
       mood: t.mood,
       isrc: t.isrc,
@@ -218,8 +220,8 @@ export default function HomePage() {
 
                   {/* Album art */}
                   <div className="w-10 h-10 rounded bg-[var(--color-surface-lighter)] flex-shrink-0 overflow-hidden">
-                    {track.album?.artwork ? (
-                      <img src={track.album.artwork} alt="" className="w-full h-full object-cover" />
+                    {(track.coverUrl || track.album?.artwork) ? (
+                      <img src={(track.coverUrl || track.album?.artwork)!} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#666]">

@@ -124,6 +124,9 @@ model Track {
   audioUrlFlac  String?  // FLAC lossless (hifi)
   audioOriginal String?  // Original uploaded file
   
+  // Cover artwork
+  coverUrl      String?  // Track cover image URL
+
   // Video
   videoUrl      String?  // Music video HLS URL
   canvasUrl     String?  // Short looping video

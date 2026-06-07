@@ -253,6 +253,7 @@ export default function UploadMusicPage() {
               isExplicit: tracks[i].isExplicit,
               trackNumber: tracks[i].trackNumber,
               audioUrl: audioUrls[i] || null,
+              coverUrl: artworkUrl || null,
             }),
           });
           if (!trackRes.ok) {
@@ -273,6 +274,7 @@ export default function UploadMusicPage() {
             isPublished: true,
             isExplicit: tracks[0]?.isExplicit || false,
             audioUrl: audioUrls[0] || null,
+            coverUrl: artworkUrl || null,
           }),
         });
         if (!trackRes.ok) {

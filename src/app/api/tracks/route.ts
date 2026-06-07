@@ -76,6 +76,7 @@ export async function POST(request: NextRequest) {
         audioOriginal: audioUrl || null,
         audioUrl128: audioUrl || null,
         audioUrl320: audioUrl || null,
+        coverUrl: coverUrl || null,
       },
       include: { artist: true, album: true },
     });
