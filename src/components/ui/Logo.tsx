@@ -26,10 +26,10 @@ export function Logo({ size = 32, showText = true }: { size?: number; showText?:
       {showText && (
         <div className="flex flex-col leading-tight">
           <span className="text-lg font-bold bg-gradient-to-r from-[#1ed760] via-[#00d4aa] to-[#0099ff] bg-clip-text text-transparent">
-            Intube
+            Intube Music
           </span>
-          <span className="text-[10px] font-semibold tracking-[0.2em] text-[var(--color-text-muted)] uppercase">
-            Music
+          <span className="text-[10px] font-medium tracking-wide text-[var(--color-text-muted)]">
+            by Intube Media
           </span>
         </div>
       )}
