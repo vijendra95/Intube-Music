@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, artistId, albumId, duration, genre, mood, isExplicit, trackNumber } = body;
+    const { title, artistId, albumId, duration, genre, mood, isExplicit, trackNumber, audioUrl, coverUrl } = body;
 
     if (!title || !artistId) {
       return NextResponse.json({ error: 'Title and artistId are required' }, { status: 400 });
@@ -60,6 +60,8 @@ export async function POST(request: NextRequest) {
         isExplicit: isExplicit || false,
         trackNumber: trackNumber || 1,
         isPublished: true,
+        audioOriginal: audioUrl || null,
+        audioUrl128: audioUrl || null,
       },
       include: { artist: true, album: true },
     });

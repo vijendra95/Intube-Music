@@ -129,6 +129,7 @@ export default function UploadMusicPage() {
             type: uploadType.toUpperCase(),
             genre,
             releaseDate: releaseDate || undefined,
+            artwork: artworkUrl || undefined,
           }),
         });
         const albumData = await albumRes.json();
@@ -146,6 +147,7 @@ export default function UploadMusicPage() {
               genre,
               isExplicit: tracks[i].isExplicit,
               trackNumber: tracks[i].trackNumber,
+              audioUrl: audioUrls[i] || null,
             }),
           });
         }
@@ -159,6 +161,7 @@ export default function UploadMusicPage() {
             artistId,
             genre,
             isExplicit: tracks[0]?.isExplicit || false,
+            audioUrl: audioUrls[0] || null,
           }),
         });
       }

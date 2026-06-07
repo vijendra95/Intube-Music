@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, artistId, labelId, type, genre, releaseDate, isExplicit, description } = body;
+    const { title, artistId, labelId, type, genre, releaseDate, isExplicit, description, artwork } = body;
 
     if (!title || !artistId) {
       return NextResponse.json({ error: 'Title and artistId are required' }, { status: 400 });
@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
         releaseDate: releaseDate ? new Date(releaseDate) : null,
         isExplicit: isExplicit || false,
         description: description || null,
+        artwork: artwork || null,
         isPublished: true,
       },
       include: { artist: true, label: true },
