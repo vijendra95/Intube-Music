@@ -37,7 +37,9 @@ export async function GET(request: NextRequest) {
       playCount: Number(t.playCount),
       artist: t.artist ? { ...t.artist, totalStreams: Number(t.artist.totalStreams), monthlyListeners: Number(t.artist.monthlyListeners) } : null,
     }));
-    return NextResponse.json({ tracks: serialized, total: Number(total), page, limit });
+    const response = NextResponse.json({ tracks: serialized, total: Number(total), page, limit });
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    return response;
   } catch (error) {
     console.error('GET /api/tracks error:', error);
     return NextResponse.json({ error: 'Failed to fetch tracks' }, { status: 500 });

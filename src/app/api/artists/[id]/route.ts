@@ -1,6 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    // Try by slug first, then by id
+    let artist = await prisma.artist.findUnique({ where: { slug: id } });
+    if (!artist) {
+      artist = await prisma.artist.findUnique({ where: { id } });
+    }
+    if (!artist) {
+      return NextResponse.json({ error: 'Artist not found' }, { status: 404 });
+    }
+    return NextResponse.json({
+      ...artist,
+      totalStreams: Number(artist.totalStreams),
+      monthlyListeners: Number(artist.monthlyListeners),
+      genres: artist.genres ? (() => { try { return JSON.parse(artist.genres!); } catch { return []; } })() : [],
+      socialLinks: artist.socialLinks ? (() => { try { return JSON.parse(artist.socialLinks!); } catch { return {}; } })() : {},
+    });
+  } catch (error) {
+    console.error('GET /api/artists/[id] error:', error);
+    return NextResponse.json({ error: 'Failed to fetch artist' }, { status: 500 });
+  }
+}
+
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;

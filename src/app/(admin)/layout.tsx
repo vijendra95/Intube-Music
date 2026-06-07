@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -33,9 +34,7 @@ export default function AdminLayout({
         {/* Logo */}
         <div className="p-5 border-b border-[#2a2a4a]">
           <Link href="/admin/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">
-              <span className="text-black font-bold text-xs">IM</span>
-            </div>
+            <Image src="/intube-media-logo.jpeg" alt="Intube Media" width={36} height={36} className="rounded-lg" />
             <div>
               <span className="text-base font-bold text-white">Intube Music</span>
               <p className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider">Admin Panel</p>
