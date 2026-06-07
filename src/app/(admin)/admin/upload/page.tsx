@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { upload } from '@vercel/blob/client';
 
 interface TrackUpload {
   title: string;
@@ -133,34 +134,35 @@ export default function UploadMusicPage() {
     setUploadStatus('uploading');
 
     try {
-      // Step 1: Upload artwork if provided
+      // Step 1: Upload artwork if provided (client-side direct to Blob)
       let artworkUrl = '';
       if (artwork) {
         setUploadProgress(10);
-        const artForm = new FormData();
-        artForm.append('file', artwork);
-        artForm.append('type', 'image');
-        const artRes = await fetch('/api/upload', { method: 'POST', body: artForm });
-        if (artRes.ok) {
-          const artData = await artRes.json();
-          artworkUrl = artData.url;
+        try {
+          const artBlob = await upload(artwork.name, artwork, {
+            access: 'public',
+            handleUploadUrl: '/api/upload',
+          });
+          artworkUrl = artBlob.url;
+        } catch (err) {
+          console.error('Artwork upload failed:', err);
         }
       }
       setUploadProgress(30);
 
-      // Step 2: Upload audio files
+      // Step 2: Upload audio files (client-side direct to Blob - no size limit)
       const audioUrls: string[] = [];
       for (let i = 0; i < tracks.length; i++) {
         const track = tracks[i];
         if (track.file) {
-          const audioForm = new FormData();
-          audioForm.append('file', track.file);
-          audioForm.append('type', 'audio');
-          const audioRes = await fetch('/api/upload', { method: 'POST', body: audioForm });
-          if (audioRes.ok) {
-            const audioData = await audioRes.json();
-            audioUrls.push(audioData.url);
-          } else {
+          try {
+            const audioBlob = await upload(track.file.name, track.file, {
+              access: 'public',
+              handleUploadUrl: '/api/upload',
+            });
+            audioUrls.push(audioBlob.url);
+          } catch (err) {
+            console.error('Audio upload failed:', err);
             audioUrls.push('');
           }
         } else {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { upload } from '@vercel/blob/client';
 
 interface BannerData {
   id: string;
@@ -79,17 +80,19 @@ export default function BannersPage() {
     }
     setSaving(true);
     try {
-      // Upload image first
-      const imgForm = new FormData();
-      imgForm.append('file', form.image);
-      imgForm.append('type', 'image');
-      const uploadRes = await fetch('/api/upload', { method: 'POST', body: imgForm });
-      if (!uploadRes.ok) {
+      // Upload image directly to Blob storage (client-side)
+      let imageUrl = '';
+      try {
+        const blob = await upload(form.image.name, form.image, {
+          access: 'public',
+          handleUploadUrl: '/api/upload',
+        });
+        imageUrl = blob.url;
+      } catch {
         alert('Image upload failed');
         setSaving(false);
         return;
       }
-      const { url: imageUrl } = await uploadRes.json();
 
       // Create banner
       const res = await fetch('/api/banners', {
