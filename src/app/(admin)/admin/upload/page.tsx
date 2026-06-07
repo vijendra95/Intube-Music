@@ -51,7 +51,7 @@ export default function UploadMusicPage() {
   useEffect(() => { loadArtists(); loadLabels(); }, []);
 
   const handleCreateArtist = async () => {
-    if (!newArtistName.trim()) return;
+    if (!newArtistName.trim()) { alert('Please enter artist name'); return; }
     setCreatingArtist(true);
     try {
       const res = await fetch('/api/artists', {
@@ -61,19 +61,25 @@ export default function UploadMusicPage() {
       });
       if (res.ok) {
         const created = await res.json();
-        loadArtists();
+        // Reload artists and wait for it, then set the new artist
+        const listRes = await fetch('/api/artists?limit=100');
+        const listData = await listRes.json();
+        const list = Array.isArray(listData) ? listData : (listData.artists || []);
+        setArtists(list);
         setArtistId(created.id);
         setShowNewArtist(false);
         setNewArtistName('');
+        alert('Artist "' + created.name + '" created successfully!');
       } else {
-        alert('Failed to create artist');
+        const err = await res.json().catch(() => ({}));
+        alert('Failed to create artist: ' + (err.error || 'Unknown error'));
       }
-    } catch { alert('Network error'); }
+    } catch { alert('Network error creating artist'); }
     finally { setCreatingArtist(false); }
   };
 
   const handleCreateLabel = async () => {
-    if (!newLabelName.trim()) return;
+    if (!newLabelName.trim()) { alert('Please enter label name'); return; }
     setCreatingLabel(true);
     try {
       const res = await fetch('/api/labels', {
@@ -83,14 +89,20 @@ export default function UploadMusicPage() {
       });
       if (res.ok) {
         const created = await res.json();
-        loadLabels();
+        // Reload labels and wait for it, then set the new label
+        const listRes = await fetch('/api/labels?limit=100');
+        const listData = await listRes.json();
+        const list = Array.isArray(listData) ? listData : (listData.labels || []);
+        setLabels(list);
         setLabelId(created.id);
         setShowNewLabel(false);
         setNewLabelName('');
+        alert('Label "' + created.name + '" created successfully!');
       } else {
-        alert('Failed to create label');
+        const err = await res.json().catch(() => ({}));
+        alert('Failed to create label: ' + (err.error || 'Unknown error'));
       }
-    } catch { alert('Network error'); }
+    } catch { alert('Network error creating label'); }
     finally { setCreatingLabel(false); }
   };
 
