@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ArtistForm {
   name: string;
@@ -15,9 +15,17 @@ interface ArtistForm {
   labelId: string;
 }
 
+interface ArtistData {
+  id: string;
+  name: string;
+  genres: string | null;
+  verified: boolean;
+  country: string | null;
+}
+
 export default function ArtistsPage() {
   const [showForm, setShowForm] = useState(false);
-  const [artists] = useState<Array<{ id: string; name: string; genres: string[]; verified: boolean; tracks: number }>>([]);
+  const [artists, setArtists] = useState<ArtistData[]>([]);
   const [form, setForm] = useState<ArtistForm>({
     name: '',
     bio: '',
@@ -30,12 +38,46 @@ export default function ArtistsPage() {
     spotify: '',
     labelId: '',
   });
+  const [saving, setSaving] = useState(false);
+
+  const loadArtists = () => {
+    fetch('/api/artists').then(r => r.json()).then(data => {
+      const list = Array.isArray(data) ? data : (data.artists || []);
+      setArtists(list);
+    }).catch(() => {});
+  };
+
+  useEffect(() => { loadArtists(); }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: API call to create artist
-    alert('Artist created! (API not connected yet)');
-    setShowForm(false);
+    setSaving(true);
+    try {
+      const res = await fetch('/api/artists', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          bio: form.bio,
+          country: form.country,
+          genres: form.genres,
+          socialLinks: { instagram: form.instagram, youtube: form.youtube, spotify: form.spotify },
+          labelId: form.labelId || null,
+        }),
+      });
+      if (res.ok) {
+        setShowForm(false);
+        setForm({ name: '', bio: '', country: 'India', genres: [], avatar: null, coverImage: null, instagram: '', youtube: '', spotify: '', labelId: '' });
+        loadArtists();
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Failed to create artist');
+      }
+    } catch {
+      alert('Network error');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -146,9 +188,10 @@ export default function ArtistsPage() {
             <div className="md:col-span-2 flex gap-3 mt-2">
               <button
                 type="submit"
-                className="px-5 py-2.5 bg-[var(--color-primary)] text-black font-semibold text-sm rounded-lg hover:bg-[var(--color-primary-hover)]"
+                disabled={saving}
+                className="px-5 py-2.5 bg-[var(--color-primary)] text-black font-semibold text-sm rounded-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50"
               >
-                Save Artist
+                {saving ? 'Saving...' : 'Save Artist'}
               </button>
               <button
                 type="button"
@@ -175,25 +218,21 @@ export default function ArtistsPage() {
             <thead className="border-b border-[#2a2a4a]">
               <tr className="text-left text-xs text-[#8888aa] uppercase">
                 <th className="px-6 py-3">Artist</th>
+                <th className="px-6 py-3">Country</th>
                 <th className="px-6 py-3">Genres</th>
-                <th className="px-6 py-3">Tracks</th>
-                <th className="px-6 py-3">Verified</th>
-                <th className="px-6 py-3">Actions</th>
+                <th className="px-6 py-3">Status</th>
               </tr>
             </thead>
             <tbody>
               {artists.map((artist) => (
                 <tr key={artist.id} className="border-b border-[#2a2a4a] hover:bg-[#2a2a4a]/50">
                   <td className="px-6 py-4 text-white font-medium">{artist.name}</td>
-                  <td className="px-6 py-4 text-[#8888aa] text-sm">{artist.genres.join(', ')}</td>
-                  <td className="px-6 py-4 text-[#8888aa]">{artist.tracks}</td>
+                  <td className="px-6 py-4 text-[#8888aa] text-sm">{artist.country || '-'}</td>
+                  <td className="px-6 py-4 text-[#8888aa] text-sm">{artist.genres ? (typeof artist.genres === 'string' ? JSON.parse(artist.genres).join(', ') : '') : '-'}</td>
                   <td className="px-6 py-4">
                     <span className={`text-xs px-2 py-1 rounded ${artist.verified ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}>
-                      {artist.verified ? 'Verified' : 'Pending'}
+                      {artist.verified ? 'Verified' : 'Active'}
                     </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button className="text-sm text-[var(--color-primary)] hover:underline">Edit</button>
                   </td>
                 </tr>
               ))}

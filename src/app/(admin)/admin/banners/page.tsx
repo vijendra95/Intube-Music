@@ -1,10 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+interface BannerData {
+  id: string;
+  title: string;
+  imageUrl: string;
+  isActive: boolean;
+  position: number;
+}
 
 export default function BannersPage() {
   const [showForm, setShowForm] = useState(false);
-  const [banners] = useState<Array<{ id: string; title: string; imageUrl: string; isActive: boolean; position: number }>>([]);
+  const [banners, setBanners] = useState<BannerData[]>([]);
   const [form, setForm] = useState({
     title: '',
     subtitle: '',
@@ -13,6 +21,16 @@ export default function BannersPage() {
     image: null as File | null,
     imagePreview: null as string | null,
   });
+  const [saving, setSaving] = useState(false);
+
+  const loadBanners = () => {
+    fetch('/api/banners').then(r => r.json()).then(data => {
+      const list = Array.isArray(data) ? data : (data.banners || []);
+      setBanners(list);
+    }).catch(() => {});
+  };
+
+  useEffect(() => { loadBanners(); }, []);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -26,8 +44,49 @@ export default function BannersPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Banner created! (API not connected yet)');
-    setShowForm(false);
+    if (!form.image) {
+      alert('Please select a banner image');
+      return;
+    }
+    setSaving(true);
+    try {
+      // Upload image first
+      const imgForm = new FormData();
+      imgForm.append('file', form.image);
+      imgForm.append('type', 'image');
+      const uploadRes = await fetch('/api/upload', { method: 'POST', body: imgForm });
+      if (!uploadRes.ok) {
+        alert('Image upload failed');
+        setSaving(false);
+        return;
+      }
+      const { url: imageUrl } = await uploadRes.json();
+
+      // Create banner
+      const res = await fetch('/api/banners', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: form.title,
+          subtitle: form.subtitle,
+          imageUrl,
+          linkUrl: form.linkUrl,
+          linkType: form.linkType,
+        }),
+      });
+      if (res.ok) {
+        setShowForm(false);
+        setForm({ title: '', subtitle: '', linkUrl: '', linkType: 'playlist', image: null, imagePreview: null });
+        loadBanners();
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Failed to create banner');
+      }
+    } catch {
+      alert('Network error');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
