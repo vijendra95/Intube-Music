@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 const adminNavItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: '📊' },
   { href: '/admin/upload', label: 'Upload Music', icon: '🎵' },
+  { href: '/admin/tracks', label: 'All Tracks', icon: '🎶' },
   { href: '/admin/artists', label: 'Artists', icon: '🎤' },
   { href: '/admin/labels', label: 'Labels', icon: '🏷️' },
   { href: '/admin/albums', label: 'Albums', icon: '💿' },
